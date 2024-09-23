@@ -33,4 +33,4 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: run Python Script
         run: |
-          pdoc cfbd_json_py -o ./docs
+          pdoc ncaa_stats_py -o ./docs
