@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools","wheel","pandas","tqdm","requests","lxml","pytz","numpy","beautifulsoup4"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ncaa_stats_py"
+version = "0.0.1"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+authors = [
+    {name = "Joseph Armstrong", email="armstrongjoseph08@gmail.com"}
+]
+
+maintainers = [
+    {name = "Joseph Armstrong", email="armstrongjoseph08@gmail.com"}
+]
+
+description = "Allows a user to download and parse data from the National Collegiate Athletics Association (NCAA), and it's member sports."
+
+keywords = ['sports','college','college sports', 'baseball']
+
+classifiers = [
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+]
+
+dependencies = [
+    "setuptools>=67.6.0",
+    "wheel",
+    "pandas>=2.2.3",
+    "tqdm",
+    "requests",
+    "lxml",
+    "pytz>=2024.2",
+    "beautifulsoup4>=4.12.2"
+]
+
+[project.urls]
+homepage = "https://github.com/armstjc/ncaa_stats_py"
+documentation = "https://github.com/armstjc/ncaa_stats_py"
+repository = "https://github.com/armstjc/ncaa_stats_py.git"
+changelog = "https://github.com/armstjc/ncaa_stats_py/blob/main/CHANGELOG.md"
