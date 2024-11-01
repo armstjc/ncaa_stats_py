@@ -45,7 +45,7 @@ things when attempting to get data:
 2. Automatically forcing a 5 second sleep timer for any HTML call,
     to ensure that any function call from this package
     won't result in you getting IP banned
-    (you do not *need* to add sleep timers if you're looping through, 
+    (you do not *need* to add sleep timers if you're looping through,
     and calling functions in this python package).
 3. Automatically refreshing any cached data if it's stale.
 
@@ -62,13 +62,24 @@ from ncaa_stats_py.baseball import (
     load_baseball_teams
 )
 
+start_time = timer()
+
 # Loads in a table with every NCAA baseball team from 2008 to present day.
+# If this is the first time you run this script,
+# it may take some time to repopulate the NCAA baseball team information data.
+
 teams_df = load_baseball_teams()
+
+end_time = timer()
+
+time_elapsed = end_time - start_time
+print(f"Elapsed time: {time_elapsed:03f} seconds.\n\n")
 
 # Gets 5 random D1 teams from 2023
 teams_df = teams_df.sample(5)
 print(teams_df)
 print()
+
 
 # Let's send this to a list to make the loop slightly faster
 team_ids_list = teams_df["team_id"].to_list()
@@ -107,3 +118,4 @@ print(f"Elapsed time: {time_elapsed:03f} seconds.\n\n")
 """
 
 from ncaa_stats_py.baseball import *  # noqa: F403
+from ncaa_stats_py.basketball import *  # noqa: F403
