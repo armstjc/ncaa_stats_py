@@ -1552,13 +1552,26 @@
     <span class="n">load_baseball_teams</span>
 <span class="p">)</span>
 
+<span class="n">start_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+
 <span class="c1"># Loads in a table with every NCAA baseball team from 2008 to present day.</span>
+<span class="c1"># If this is the first time you run this script,</span>
+<span class="c1"># it may take some time to repopulate the NCAA baseball team information data.</span>
+
 <span class="n">teams_df</span> <span class="o">=</span> <span class="n">load_baseball_teams</span><span class="p">()</span>
+
+<span class="n">end_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
+
+<span class="n">time_elapsed</span> <span class="o">=</span> <span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Elapsed time: </span><span class="si">{</span><span class="n">time_elapsed</span><span class="si">:</span><span class="s2">03f</span><span class="si">}</span><span class="s2"> seconds.</span>
+
+<span class="s2">&quot;)</span>
 
 <span class="c1"># Gets 5 random D1 teams from 2023</span>
 <span class="n">teams_df</span> <span class="o">=</span> <span class="n">teams_df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">teams_df</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">()</span>
+
 
 <span class="c1"># Let&#39;s send this to a list to make the loop slightly faster</span>
 <span class="n">team_ids_list</span> <span class="o">=</span> <span class="n">teams_df</span><span class="p">[</span><span class="s2">&quot;team_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
@@ -1651,7 +1664,7 @@
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="sd">2. Automatically forcing a 5 second sleep timer for any HTML call,</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">    to ensure that any function call from this package</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">    won&#39;t result in you getting IP banned</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">    (you do not *need* to add sleep timers if you&#39;re looping through, </span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">    (you do not *need* to add sleep timers if you&#39;re looping through,</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="sd">    and calling functions in this python package).</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">3. Automatically refreshing any cached data if it&#39;s stale.</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
@@ -1668,51 +1681,63 @@
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">    load_baseball_teams</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">)</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd"># Loads in a table with every NCAA baseball team from 2008 to present day.</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">teams_df = load_baseball_teams()</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd"># Gets 5 random D1 teams from 2023</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">teams_df = teams_df.sample(5)</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">print(teams_df)</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">print()</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">start_time = timer()</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd"># Loads in a table with every NCAA baseball team from 2008 to present day.</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd"># If this is the first time you run this script,</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd"># it may take some time to repopulate the NCAA baseball team information data.</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">teams_df = load_baseball_teams()</span>
 </span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd"># Let&#39;s send this to a list to make the loop slightly faster</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">team_ids_list = teams_df[&quot;team_id&quot;].to_list()</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd"># First loop</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd"># If the data isn&#39;t cached, it should take 35-40 seconds to do this loop</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="sd">start_time = timer()</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">for t_id in team_ids_list:</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">    print(f&quot;On Team ID: {t_id}&quot;)</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">    df = get_baseball_team_roster(team_id=t_id)</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">    # print(df)</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">end_time = timer()</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">end_time = timer()</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">time_elapsed = end_time - start_time</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">print(f&quot;Elapsed time: {time_elapsed:03f} seconds.\n\n&quot;)</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="sd"># Gets 5 random D1 teams from 2023</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">teams_df = teams_df.sample(5)</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">print(teams_df)</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">print()</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd"># Let&#39;s send this to a list to make the loop slightly faster</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">team_ids_list = teams_df[&quot;team_id&quot;].to_list()</span>
 </span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">time_elapsed = end_time - start_time</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">print(f&quot;Elapsed time: {time_elapsed:03f} seconds.\n\n&quot;)</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd"># Second loop</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd"># Because the data has been parsed and cached,</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd"># this shouldn&#39;t take that long to loop through</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">start_time = timer()</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">for t_id in team_ids_list:</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">    print(f&quot;On Team ID: {t_id}&quot;)</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    df = get_baseball_team_roster(team_id=t_id)</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">    # print(df)</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">end_time = timer()</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">time_elapsed = end_time - start_time</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">print(f&quot;Elapsed time: {time_elapsed:03f} seconds.\n\n&quot;)</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">```</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd"># First loop</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd"># If the data isn&#39;t cached, it should take 35-40 seconds to do this loop</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">start_time = timer()</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">for t_id in team_ids_list:</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">    print(f&quot;On Team ID: {t_id}&quot;)</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">    df = get_baseball_team_roster(team_id=t_id)</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">    # print(df)</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">end_time = timer()</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">time_elapsed = end_time - start_time</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">print(f&quot;Elapsed time: {time_elapsed:03f} seconds.\n\n&quot;)</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd"># Second loop</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd"># Because the data has been parsed and cached,</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd"># this shouldn&#39;t take that long to loop through</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">start_time = timer()</span>
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="kn">from</span> <span class="nn">ncaa_stats_py.baseball</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="sd">for t_id in team_ids_list:</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="sd">    print(f&quot;On Team ID: {t_id}&quot;)</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="sd">    df = get_baseball_team_roster(team_id=t_id)</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="sd">    # print(df)</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="sd">end_time = timer()</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="sd">time_elapsed = end_time - start_time</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="sd">print(f&quot;Elapsed time: {time_elapsed:03f} seconds.\n\n&quot;)</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">```</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="kn">from</span> <span class="nn">ncaa_stats_py.baseball</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># noqa: F403</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="kn">from</span> <span class="nn">ncaa_stats_py.basketball</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># noqa: F403</span>
 </span></pre>
             </div>
 

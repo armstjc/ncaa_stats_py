@@ -6,6 +6,7 @@
 # - 2024-06-25 07:40 PM EDT
 # - 2024-09-19 04:30 PM EDT
 # - 2024-09-23 10:30 PM EDT
+# - 2024-11-01 12:10 AM EDT
 
 
 import logging
@@ -89,6 +90,7 @@ def get_baseball_teams(season: int, level: str | int) -> pd.DataFrame:
     #     return isinstance(elem, Comment)
 
     load_from_cache = True
+    sport_id = "MBA"
     home_dir = expanduser("~")
     home_dir = _format_folder_str(home_dir)
     teams_df = pd.DataFrame()
@@ -279,6 +281,7 @@ def get_baseball_teams(season: int, level: str | int) -> pd.DataFrame:
                 "team_conference_name": team_conference_name,
                 "team_id": team_id,
                 "school_name": team_name,
+                "sport_id": sport_id
             },
             index=[0],
         )
@@ -411,6 +414,7 @@ def get_baseball_team_schedule(team_id: int) -> pd.DataFrame:
     A pandas `DataFrame` object with an NCAA baseball team's schedule.
 
     """
+    sport_id = "MBA"
     schools_df = _get_schools()
     games_df = pd.DataFrame()
     games_df_arr = []
@@ -432,7 +436,7 @@ def get_baseball_team_schedule(team_id: int) -> pd.DataFrame:
     ncaa_division_formatted = team_df["ncaa_division_formatted"].iloc[0]
     # team_conference_name = team_df["team_conference_name"].iloc[0]
     # school_name = team_df["school_name"].iloc[0]
-    # school_id = team_df["school_id"].iloc[0]
+    # school_id = int(team_df["school_id"].iloc[0])
 
     del team_df
 
@@ -831,6 +835,7 @@ def get_baseball_team_schedule(team_id: int) -> pd.DataFrame:
     games_df = games_df.merge(right=temp_df, on="away_team_name", how="left")
     games_df["ncaa_division"] = ncaa_division
     games_df["ncaa_division_formatted"] = ncaa_division_formatted
+    games_df["sport_id"] = sport_id
 
     # games_df["game_url"] = games_df["game_url"].str.replace("/box_score", "")
     games_df.to_csv(
@@ -1050,6 +1055,7 @@ def get_baseball_team_roster(team_id: int) -> pd.DataFrame:
     A pandas `DataFrame` object with
     an NCAA baseball team's roster for that season.
     """
+    sport_id = "MBA"
     roster_df = pd.DataFrame()
     roster_df_arr = []
     temp_df = pd.DataFrame()
@@ -1067,7 +1073,7 @@ def get_baseball_team_roster(team_id: int) -> pd.DataFrame:
     ncaa_division_formatted = team_df["ncaa_division_formatted"].iloc[0]
     team_conference_name = team_df["team_conference_name"].iloc[0]
     school_name = team_df["school_name"].iloc[0]
-    school_id = team_df["school_id"].iloc[0]
+    school_id = int(team_df["school_id"].iloc[0])
 
     del team_df
 
@@ -1193,7 +1199,7 @@ def get_baseball_team_roster(team_id: int) -> pd.DataFrame:
     roster_df["team_conference_name"] = team_conference_name
     roster_df["school_id"] = school_id
     roster_df["school_name"] = school_name
-
+    roster_df["sport_id"] = sport_id
     roster_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/baseball/rosters/" +
         f"{team_id}_roster.csv",
@@ -1254,6 +1260,7 @@ def get_baseball_player_season_batting_stats(
     A pandas `DataFrame` object with the season batting stats for
     all players with a given NCAA baseball team.
     """
+    sport_id = "MBA"
     load_from_cache = True
     stats_df = pd.DataFrame()
     stats_df_arr = []
@@ -1268,7 +1275,7 @@ def get_baseball_player_season_batting_stats(
     ncaa_division_formatted = team_df["ncaa_division_formatted"].iloc[0]
     team_conference_name = team_df["team_conference_name"].iloc[0]
     school_name = team_df["school_name"].iloc[0]
-    school_id = team_df["school_id"].iloc[0]
+    school_id = int(team_df["school_id"].iloc[0])
 
     del team_df
 
@@ -1312,17 +1319,18 @@ def get_baseball_player_season_batting_stats(
 
     if exists(
         f"{home_dir}/.ncaa_stats_py/baseball/player_season_stats/batting/"
-        + f"{season}_{school_id}_player_batting_season_stats.csv"
+        + f"{season:00d}_{school_id:00d}_player_batting_season_stats.csv"
     ):
         games_df = pd.read_csv(
             f"{home_dir}/.ncaa_stats_py/baseball/player_season_stats/batting/"
-            + f"{season}_{school_id}_player_batting_season_stats.csv"
+            + f"{season:00d}_{school_id:00d}_player_batting_season_stats.csv"
         )
         file_mod_datetime = datetime.fromtimestamp(
             getmtime(
                 f"{home_dir}/.ncaa_stats_py/baseball/"
                 + "player_season_stats/batting/"
-                + f"{season}_{school_id}_player_batting_season_stats.csv"
+                + f"{season:00d}_{school_id:00d}" +
+                "_player_batting_season_stats.csv"
             )
         )
     else:
@@ -1434,6 +1442,7 @@ def get_baseball_player_season_batting_stats(
     stats_df["ncaa_division"] = ncaa_division
     stats_df["ncaa_division_formatted"] = ncaa_division_formatted
     stats_df["team_conference_name"] = team_conference_name
+    stats_df["sport_id"] = sport_id
 
     stats_df = stats_df.infer_objects()
 
@@ -1475,7 +1484,7 @@ def get_baseball_player_season_batting_stats(
     stats_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/baseball/"
         + "player_season_stats/batting/"
-        + f"{season}_{school_id}_player_batting_season_stats.csv",
+        + f"{season:00d}_{school_id:00d}_player_batting_season_stats.csv",
         index=False,
     )
 
@@ -1536,6 +1545,7 @@ def get_baseball_player_season_pitching_stats(
     A pandas `DataFrame` object with the season pitching stats for
     all players with a given NCAA baseball team.
     """
+    sport_id = "MBA"
     load_from_cache = True
     stats_df = pd.DataFrame()
     stats_df_arr = []
@@ -1550,7 +1560,7 @@ def get_baseball_player_season_pitching_stats(
     ncaa_division_formatted = team_df["ncaa_division_formatted"].iloc[0]
     team_conference_name = team_df["team_conference_name"].iloc[0]
     school_name = team_df["school_name"].iloc[0]
-    school_id = team_df["school_id"].iloc[0]
+    school_id = int(team_df["school_id"].iloc[0])
 
     del team_df
 
@@ -1594,17 +1604,18 @@ def get_baseball_player_season_pitching_stats(
 
     if exists(
         f"{home_dir}/.ncaa_stats_py/baseball/player_season_stats/pitching/"
-        + f"{season}_{school_id}_player_pitching_season_stats.csv"
+        + f"{season:00d}_{school_id:00d}_player_pitching_season_stats.csv"
     ):
         games_df = pd.read_csv(
             f"{home_dir}/.ncaa_stats_py/baseball/player_season_stats/pitching/"
-            + f"{season}_{school_id}_player_pitching_season_stats.csv"
+            + f"{season:00d}_{school_id:00d}_player_pitching_season_stats.csv"
         )
         file_mod_datetime = datetime.fromtimestamp(
             getmtime(
                 f"{home_dir}/.ncaa_stats_py/baseball/"
                 + "player_season_stats/pitching/"
-                + f"{season}_{school_id}_player_pitching_season_stats.csv"
+                + f"{season:00d}_{school_id:00d}" +
+                "_player_pitching_season_stats.csv"
             )
         )
     else:
@@ -1716,6 +1727,7 @@ def get_baseball_player_season_pitching_stats(
     stats_df["ncaa_division"] = ncaa_division
     stats_df["ncaa_division_formatted"] = ncaa_division_formatted
     stats_df["team_conference_name"] = team_conference_name
+    stats_df["sport_id"] = sport_id
 
     stats_df = stats_df.infer_objects()
 
@@ -1777,7 +1789,7 @@ def get_baseball_player_season_pitching_stats(
     stats_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/baseball/"
         + "player_season_stats/pitching/"
-        + f"{season}_{school_id}_player_pitching_season_stats.csv",
+        + f"{season:00d}_{school_id:00d}_player_pitching_season_stats.csv",
         index=False,
     )
 
@@ -1838,6 +1850,7 @@ def get_baseball_player_season_fielding_stats(
     A pandas `DataFrame` object with the season fielding stats for
     all players with a given NCAA baseball team.
     """
+    sport_id = "MBA"
     load_from_cache = True
     stats_df = pd.DataFrame()
     stats_df_arr = []
@@ -1852,7 +1865,7 @@ def get_baseball_player_season_fielding_stats(
     ncaa_division_formatted = team_df["ncaa_division_formatted"].iloc[0]
     team_conference_name = team_df["team_conference_name"].iloc[0]
     school_name = team_df["school_name"].iloc[0]
-    school_id = team_df["school_id"].iloc[0]
+    school_id = int(team_df["school_id"].iloc[0])
 
     del team_df
 
@@ -1896,17 +1909,18 @@ def get_baseball_player_season_fielding_stats(
 
     if exists(
         f"{home_dir}/.ncaa_stats_py/baseball/player_season_stats/fielding/"
-        + f"{season}_{school_id}_player_fielding_season_stats.csv"
+        + f"{season:00d}_{school_id:00d}_player_fielding_season_stats.csv"
     ):
         games_df = pd.read_csv(
             f"{home_dir}/.ncaa_stats_py/baseball/player_season_stats/fielding/"
-            + f"{season}_{school_id}_player_fielding_season_stats.csv"
+            + f"{season:00d}_{school_id:00d}_player_fielding_season_stats.csv"
         )
         file_mod_datetime = datetime.fromtimestamp(
             getmtime(
                 f"{home_dir}/.ncaa_stats_py/baseball/"
                 + "player_season_stats/fielding/"
-                + f"{season}_{school_id}_player_fielding_season_stats.csv"
+                + f"{season:00d}_{school_id:00d}" +
+                "_player_fielding_season_stats.csv"
             )
         )
     else:
@@ -2016,6 +2030,7 @@ def get_baseball_player_season_fielding_stats(
     stats_df["ncaa_division"] = ncaa_division
     stats_df["ncaa_division_formatted"] = ncaa_division_formatted
     stats_df["team_conference_name"] = team_conference_name
+    stats_df["sport_id"] = sport_id
 
     stats_df = stats_df.infer_objects()
 
@@ -2060,7 +2075,7 @@ def get_baseball_player_season_fielding_stats(
     stats_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/baseball/"
         + "player_season_stats/fielding/"
-        + f"{season}_{school_id}_player_fielding_season_stats.csv",
+        + f"{season:00d}_{school_id:00d}_player_fielding_season_stats.csv",
         index=False,
     )
 
@@ -2119,6 +2134,7 @@ def get_baseball_player_game_batting_stats(
     A pandas `DataFrame` object with a player's batting game logs
     in a given season.
     """
+    sport_id = "MBA"
     load_from_cache = True
     stats_df = pd.DataFrame()
     stats_df_arr = []
@@ -2202,7 +2218,7 @@ def get_baseball_player_game_batting_stats(
     # ncaa_division_formatted = team_df["ncaa_division_formatted"].iloc[0]
     # team_conference_name = team_df["team_conference_name"].iloc[0]
     # school_name = team_df["school_name"].iloc[0]
-    # school_id = team_df["school_id"].iloc[0]
+    # school_id = int(team_df["school_id"].iloc[0])
 
     # del team_df
     response = _get_webpage(url=url)
@@ -2380,6 +2396,7 @@ def get_baseball_player_game_batting_stats(
 
     stats_df["player_id"] = player_id
     stats_df["season"] = season
+    stats_df["sport_id"] = sport_id
 
     # ['date', 'opponent', 'Result', 'batting_G', 'R', 'AB', 'H', '2B', '3B',
     #    'TB', 'HR', 'RBI', 'BB', 'HBP', 'SF', 'SH', 'K', 'OPP DP', 'CS',
@@ -2487,6 +2504,7 @@ def get_baseball_player_game_pitching_stats(
     in a given season.
 
     """
+    sport_id = "MBA"
     load_from_cache = True
     stats_df = pd.DataFrame()
     stats_df_arr = []
@@ -2743,6 +2761,7 @@ def get_baseball_player_game_pitching_stats(
     stats_df["IP"] = stats_df["IP"].str.replace(".2", ".667")
     stats_df["IP"] = stats_df["IP"].astype("float32")
     stats_df["IP_str"] = stats_df["IP_str"].str.replace("nan", "")
+    stats_df["sport_id"] = sport_id
 
     stats_df["player_id"] = player_id
     stats_df["season"] = season
@@ -2860,6 +2879,7 @@ def get_baseball_player_game_fielding_stats(
     in a given season.
 
     """
+    sport_id = "MBA"
     load_from_cache = True
     stats_df = pd.DataFrame()
     stats_df_arr = []
@@ -3111,6 +3131,7 @@ def get_baseball_player_game_fielding_stats(
     stats_df = stats_df.infer_objects()
     stats_df["player_id"] = player_id
     stats_df["season"] = season
+    stats_df["sport_id"] = sport_id
 
     stats_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/baseball/"
@@ -3215,6 +3236,7 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
     A pandas `DataFrame` object with a player game stats in a given game.
 
     """
+    sport_id = "MBA"
     load_from_cache = True
 
     stats_df = pd.DataFrame()
@@ -3235,6 +3257,7 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
 
     stat_columns = [
         # "season",
+        "sport_id"
         "game_id",
         "team_id",
         "player_id",
@@ -3399,8 +3422,11 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
                 player_id = player_id.replace("/players", "")
                 player_id = player_id.replace("/player", "")
                 player_id = player_id.replace("/", "")
-            except Exception:
-                continue
+            except Exception as e:
+                logging.debug(
+                    "Could not replace player IDs. " +
+                    f"Full exception: `{e}`"
+                )
 
             t_cells = t.find_all("td")
             p_name = t_cells[1].text.replace("\n", "")
@@ -3667,6 +3693,7 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
             "fielding_SBA%": "float16",
         }
     )
+    stats_df['sport_id'] = sport_id
     stats_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/baseball/game_stats/player/"
         + f"{game_id}_player_game_stats.csv",
@@ -3752,11 +3779,14 @@ def get_baseball_game_team_stats(game_id: int) -> pd.DataFrame:
     A pandas `DataFrame` object with a team game stats in a given game.
 
     """
-    home_dir = expanduser("~")
-    home_dir = _format_folder_str(home_dir)
+    # home_dir = expanduser("~")
+    # home_dir = _format_folder_str(home_dir)
     df = get_baseball_game_player_stats(game_id=game_id)
 
-    final_df = df.groupby(["game_id", "team_id"], as_index=False).agg(
+    final_df = df.groupby(
+        ["sport_id", "game_id", "team_id"],
+        as_index=False
+    ).agg(
         {
             "batting_AB": "sum",
             "batting_R": "sum",
@@ -3901,6 +3931,7 @@ def get_raw_baseball_game_pbp(game_id: int):
     ----------
     A pandas `DataFrame` object with a play-by-play (PBP) data in a given game.
     """
+    sport_id = "MBA"
     load_from_cache = False
 
     pbp_df = pd.DataFrame()
@@ -3929,16 +3960,16 @@ def get_raw_baseball_game_pbp(game_id: int):
         mkdir(f"{home_dir}/.ncaa_stats_py/baseball/raw_pbp/")
 
     if exists(
-        f"{home_dir}/.ncaa_stats_py/baseball/game_stats/raw_pbp/"
+        f"{home_dir}/.ncaa_stats_py/baseball/raw_pbp/"
         + f"{game_id}_raw_pbp.csv"
     ):
         games_df = pd.read_csv(
-            f"{home_dir}/.ncaa_stats_py/baseball/game_stats/raw_pbp/"
+            f"{home_dir}/.ncaa_stats_py/baseball/raw_pbp/"
             + f"{game_id}_raw_pbp.csv"
         )
         file_mod_datetime = datetime.fromtimestamp(
             getmtime(
-                f"{home_dir}/.ncaa_stats_py/baseball/game_stats/raw_pbp/"
+                f"{home_dir}/.ncaa_stats_py/baseball/raw_pbp/"
                 + f"{game_id}_raw_pbp.csv"
             )
         )
@@ -4085,6 +4116,7 @@ def get_raw_baseball_game_pbp(game_id: int):
     pbp_df["game_datetime"] = game_date_str
     pbp_df["stadium_name"] = stadium_str
     pbp_df["attendance"] = attendance_int
+    pbp_df["sport_id"] = sport_id
 
     pbp_df = pbp_df.infer_objects()
 

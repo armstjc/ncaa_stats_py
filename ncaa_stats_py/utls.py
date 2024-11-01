@@ -7,6 +7,7 @@
 # - 2024-06-25 07:40 PM EDT
 # - 2024-09-19 04:30 PM EDT
 # - 2024-09-23 10:30 PM EDT
+# - 2024-11-01 12:10 AM EDT
 
 
 import logging
@@ -21,94 +22,113 @@ from bs4 import BeautifulSoup
 
 
 def _stat_id_dict() -> dict:
+    # For sports that span across the fall and spring
+    # semesters, the year will be whichever year is last.
+    # For example, if the sport has a season of 2020-21,
+    # the official season is "2021".
     stat_id_dict = {
         "baseball": {
             2025: {
                 "season": 2025,
+                "year_id": 596462,
                 "batting": 15687,
                 "pitching": 15688,
                 "fielding": 15689,
             },
             2024: {
                 "season": 2024,
+                "year_id": 573978,
                 "batting": 15080,
                 "pitching": 15081,
                 "fielding": 15082,
             },
             2023: {
                 "season": 2023,
+                "year_id": 548057,
                 "batting": 15000,
                 "pitching": 15001,
                 "fielding": 15002,
             },
             2022: {
                 "season": 2022,
+                "year_id": 526322,
                 "batting": 14940,
                 "pitching": 14941,
                 "fielding": 14942,
             },
             2021: {
                 "season": 2021,
+                "year_id": 508937,
                 "batting": 14760,
                 "pitching": 14761,
                 "fielding": 14762,
             },
             2020: {
                 "season": 2020,
+                "year_id": 494223,
                 "batting": 14760,
                 "pitching": 14761,
                 "fielding": 14762,
             },
             2019: {
                 "season": 2019,
+                "year_id": 471505,
                 "batting": 14643,
                 "pitching": 14644,
                 "fielding": 14645,
             },
             2018: {
                 "season": 2018,
+                "year_id": 197729,
                 "batting": 11953,
                 "pitching": 11954,
                 "fielding": 11955,
             },
             2017: {
                 "season": 2017,
+                "year_id": 65486,
                 "batting": 11000,
                 "pitching": 11001,
                 "fielding": 11002,
             },
             2016: {
                 "season": 2016,
+                "year_id": 85543,
                 "batting": 10946,
                 "pitching": 10947,
                 "fielding": 10948,
             },
             2015: {
                 "season": 2015,
+                "year_id": 18067,
                 "batting": 10780,
                 "pitching": 10781,
                 "fielding": 10782,
             },
             2014: {
                 "season": 2014,
+                "year_id": 80368,
                 "batting": 10460,
                 "pitching": 10461,
                 "fielding": 10462,
             },
             2013: {
                 "season": 2013,
+                "year_id": 78811,
                 "batting": 10120,
                 "pitching": 10121,
                 "fielding": 10122,
             },
             2012: {
                 "season": 2012,
+                "year_id": 13976,
                 "batting": 10082,
                 "pitching": 10083,
                 "fielding": 10084,
             },
             2011: {
                 "season": 2011,
+                "year_id": 97144,
                 "batting": 10002,
                 "pitching": 10001,
                 "fielding": 10000,
@@ -119,7 +139,44 @@ def _stat_id_dict() -> dict:
             #     "pitching": 10001,
             #     "fielding": 10000,
             # },
-        }
+        },
+        "mbb": {
+            2025: {"season": 2025, "year_id": 590809},
+            2024: {"season": 2024, "year_id": 560851},
+            2023: {"season": 2023, "year_id": 542048},
+            2022: {"season": 2022, "year_id": 527547},
+            2021: {"season": 2021, "year_id": 505632},
+            2020: {"season": 2020, "year_id": 486812},
+            2019: {"season": 2019, "year_id": 450523},
+            2018: {"season": 2018, "year_id": 110999},
+            2017: {"season": 2017, "year_id": 42437},
+            2016: {"season": 2016, "year_id": 21792},
+            2015: {"season": 2015, "year_id": 84004},
+            2014: {"season": 2014, "year_id": 102484},
+            2013: {"season": 2013, "year_id": 14537},
+            2012: {"season": 2012, "year_id": 57061},
+            2011: {"season": 2011, "year_id": 28307},
+            2010: {"season": 2010, "year_id": 51149},
+            2009: {"season": 2009, "year_id": 10061},
+        },
+        "wbb": {
+            2025: {"season": 2025, "year_id": 591989},
+            2024: {"season": 2024, "year_id": 560818},
+            2023: {"season": 2023, "year_id": 542324},
+            2022: {"season": 2022, "year_id": 528585},
+            2021: {"season": 2021, "year_id": 506012},
+            2020: {"season": 2020, "year_id": 484020},
+            2019: {"season": 2019, "year_id": 451682},
+            2018: {"season": 2018, "year_id": 185346},
+            2017: {"season": 2017, "year_id": 109515},
+            2016: {"season": 2016, "year_id": 22942},
+            2015: {"season": 2015, "year_id": 16713},
+            2014: {"season": 2014, "year_id": 37782},
+            2013: {"season": 2013, "year_id": 77395},
+            2012: {"season": 2012, "year_id": 30380},
+            2011: {"season": 2011, "year_id": 55652},
+            2010: {"season": 2010, "year_id": 52267},
+        },
     }
     return stat_id_dict
 
@@ -136,7 +193,7 @@ def _web_headers() -> dict:
 def _get_webpage(url: str) -> requests.Response:
     """ """
     headers = _web_headers()
-    response = requests.get(headers=headers, url=url)
+    response = requests.get(headers=headers, url=url, timeout=10)
     time.sleep(5)
     if response.status_code == 200:
         return response
@@ -296,10 +353,7 @@ def _get_schools() -> pd.DataFrame:
                 school_id = int(school_id)
 
                 temp_df = pd.DataFrame(
-                    {
-                        "school_id": school_id,
-                        "school_name": school_name
-                    },
+                    {"school_id": school_id, "school_name": school_name},
                     index=[0]
                 )
                 schools_df_arr.append(temp_df)
@@ -338,13 +392,20 @@ def _get_stat_id(sport: str, season: int, stat_type: str) -> int:
     )
 
 
-if __name__ == "__main__":
-    url = "https://stats.ncaa.org/teams/574226/season_to_date_stats"
-    response = _get_webpage(url=url)
+def _get_minute_formatted_time_from_seconds(seconds: int) -> str:
+    t_minutes = seconds // 60
+    t_seconds = seconds % 60
+    return f"{t_minutes:02d}:{t_seconds:02d}"
 
-    season = 2024
-    sport = "baseball"
-    stat_type = "batting"
-    stat_id = _get_stat_id(
-        sport=sport, season=season, stat_type=stat_type, html_data=response
-    )
+
+if __name__ == "__main__":
+    # url = "https://stats.ncaa.org/teams/574226/season_to_date_stats"
+    # response = _get_webpage(url=url)
+
+    # season = 2024
+    # sport = "baseball"
+    # stat_type = "batting"
+    # stat_id = _get_stat_id(
+    #     sport=sport, season=season, stat_type=stat_type
+    # )
+    print(_get_minute_formatted_time_from_seconds(15604))
