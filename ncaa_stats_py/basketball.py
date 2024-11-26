@@ -5,6 +5,7 @@
 # Update History:
 # - 2024-09-20 08:15 PM EDT
 # - 2024-11-01 12:10 AM EDT
+# - 2024-11-25 07:45 PM EDT
 
 import logging
 import re
@@ -743,7 +744,10 @@ def get_basketball_team_schedule(team_id: int) -> pd.DataFrame:
             del opp_text
 
             score = cells[2].text.strip()
-            if (
+            if len(score) == 0:
+                score_1 = 0
+                score_2 = 0
+            elif (
                 "canceled" not in score.lower() and
                 "ppd" not in score.lower()
             ):
@@ -1492,7 +1496,7 @@ def get_basketball_player_season_stats(
         "ncaa_division",
         "ncaa_division_formatted",
         "player_id",
-        "player_jersey_num",
+        "player_jersey_number",
         "player_last_name",
         "player_first_name",
         "player_full_name",
@@ -1736,7 +1740,7 @@ def get_basketball_player_season_stats(
 
     stats_df.rename(
         columns={
-            "#": "player_jersey_num",
+            "#": "player_jersey_number",
             "Player": "player_full_name",
             "Yr": "player_class",
             "Pos": "player_position",
@@ -1809,7 +1813,7 @@ def get_basketball_player_season_stats(
     )
     stats_df[["MP_minutes", "MP_seconds"]] = stats_df[[
         "MP_minutes", "MP_seconds"
-    ]].astype("uint16")
+    ]].astype("uint64")
     stats_df["MP_total_seconds"] = (
         stats_df["MP_seconds"] + (stats_df["MP_minutes"] * 60)
     )
@@ -2303,7 +2307,7 @@ def get_basketball_player_game_stats(
 
     stats_df.rename(
         columns={
-            "#": "player_jersey_num",
+            "#": "player_jersey_number",
             "Player": "player_full_name",
             "Yr": "player_class",
             "Pos": "player_position",
@@ -2591,7 +2595,7 @@ def get_basketball_game_player_stats(game_id: int) -> pd.DataFrame:
         "team_name",
         "player_id",
         "player_num",
-        "player_name",
+        "player_full_name",
         "player_position",
         "GP",
         "GS",
@@ -2831,7 +2835,7 @@ def get_basketball_game_player_stats(game_id: int) -> pd.DataFrame:
     stats_df.rename(
         columns={
             "#": "player_num",
-            "Name": "player_name",
+            "Name": "player_full_name",
             "P": "player_position",
             "MP": "MP_str",
             "3FG": "3PM",
@@ -2953,8 +2957,8 @@ def get_basketball_game_player_stats(game_id: int) -> pd.DataFrame:
 
     stats_df = stats_df.astype(
         {
-            "DBL_DBL": "uint8",
-            "TRP_DBL": "uint8",
+            "DBL_DBL": "uint16",
+            "TRP_DBL": "uint16",
         },
         errors="ignore"
     )
@@ -3656,21 +3660,22 @@ def get_basketball_game_starters(game_id: int) -> list:
     from the game.
 
     NOTE #1: The layout of the list will be as follows:
-    | Index |   **Away players**   |
-    | :---: | :------------------: |
-    |   0   | Away team starter #1 |
-    |   1   | Away team starter #2 |
-    |   2   | Away team starter #3 |
-    |   3   | Away team starter #4 |
-    |   4   | Away team starter #5 |
 
-    | Index |   **Home players**   |
-    | :---: | :------------------: |
-    |   5   | Home team starter #1 |
-    |   6   | Home team starter #2 |
-    |   7   | Home team starter #3 |
-    |   8   | Home team starter #4 |
-    |   9   | Home team starter #5 |
+    > | Index |   **Away players**   |
+    > | :---: | :------------------: |
+    > |   0   | Away team starter #1 |
+    > |   1   | Away team starter #2 |
+    > |   2   | Away team starter #3 |
+    > |   3   | Away team starter #4 |
+    > |   4   | Away team starter #5 |
+
+    > | Index |   **Home players**   |
+    > | :---: | :------------------: |
+    > |   5   | Home team starter #1 |
+    > |   6   | Home team starter #2 |
+    > |   7   | Home team starter #3 |
+    > |   8   | Home team starter #4 |
+    > |   9   | Home team starter #5 |
 
     NOTE #2: Starters are listed in order of when they first sub out.
     Do not assume that starter #5 for a team is a center,

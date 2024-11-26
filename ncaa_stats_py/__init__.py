@@ -119,3 +119,4 @@ print(f"Elapsed time: {time_elapsed:03f} seconds.\n\n")
 
 from ncaa_stats_py.baseball import *  # noqa: F403
 from ncaa_stats_py.basketball import *  # noqa: F403
+from ncaa_stats_py.field_hockey import *  # noqa: F403
