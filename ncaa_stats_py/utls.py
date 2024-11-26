@@ -16,7 +16,8 @@ import time
 from datetime import datetime
 from os import mkdir
 from os.path import exists, expanduser, getmtime
-from random import randint
+from secrets import SystemRandom
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -272,9 +273,11 @@ def _web_headers() -> dict:
 
 def _get_webpage(url: str) -> requests.Response:
     """ """
+    rng = SystemRandom()
     headers = _web_headers()
     response = requests.get(headers=headers, url=url, timeout=10)
-    time.sleep(randint(5, 10))
+    random_integer = 5 + rng.randint(a=0, b=5)
+    time.sleep(random_integer)
     if response.status_code == 200:
         return response
     elif response.status_code == 400:

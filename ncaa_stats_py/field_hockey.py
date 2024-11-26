@@ -6,12 +6,13 @@
 # - 2024-09-20 08:15 PM EDT
 # - 2024-11-08 08:15 PM EST
 # - 2024-11-25 07:45 PM EDT
+# - 2024-11-25 08:20 PM EDT
 
 import logging
+import re
 from datetime import date, datetime
 from os import mkdir
 from os.path import exists, expanduser, getmtime
-import re
 
 import numpy as np
 import pandas as pd
@@ -2178,51 +2179,51 @@ def get_basketball_game_team_stats(game_id: int) -> pd.DataFrame:
     ----------
     ```python
     from ncaa_stats_py.field_hockey import (
-        get_field_hockey_game_player_stats
+        get_field_hockey_game_team_stats
     )
 
-    # Get the player game stats of a November 10th, 2024 game between
+    # Get the team game stats of a November 10th, 2024 game between
     # the Michigan Wolverines and the Northwestern Wildcats.
     print(
-        "Get the player game stats of a November 10th, 2024 game between " +
+        "Get the team game stats of a November 10th, 2024 game between " +
         "the Michigan Wolverines and the Northwestern Wildcats"
     )
-    df = get_field_hockey_game_player_stats(
+    df = get_field_hockey_game_team_stats(
         game_id=5834079
     )
     print(df)
 
 
-    # Get the player game stats of a November 10th, 2024 game between
+    # Get the team game stats of a November 10th, 2024 game between
     # the Monmouth Hawks and the Delaware Blue Hens.
     print(
-        "Get the player game stats of a November 10th, 2024 game between " +
+        "Get the team game stats of a November 10th, 2024 game between " +
         "the Monmouth Hawks and the Delaware Blue Hens."
     )
-    df = get_field_hockey_game_player_stats(
+    df = get_field_hockey_game_team_stats(
         game_id=5834140
     )
     print(df)
 
-    # Get the player game stats of a November 10th, 2024 game between the
+    # Get the team game stats of a November 10th, 2024 game between the
     # Frostburg St. Bobcats and the Pace Setters on September 10th, 2023.
     print(
-        "Get the player game stats of a September 10th, 2023 game between " +
+        "Get the team game stats of a September 10th, 2023 game between " +
         "Frostburg St. Bobcats and the Pace Setters."
     )
-    df = get_field_hockey_game_player_stats(
+    df = get_field_hockey_game_team_stats(
         game_id=3954181
     )
     print(df)
 
-    # Get the player game stats of a September 16th, 2022 game between the
+    # Get the team game stats of a September 16th, 2022 game between the
     # Immaculata Mighty Macs and the Lancaster Bible Chargers.
     print(
-        "Get the player game stats of " +
+        "Get the team game stats of " +
         "a September 16th, 2022 game between the " +
         "Immaculata Mighty Macs and the Lancaster Bible Chargers."
     )
-    df = get_field_hockey_game_player_stats(
+    df = get_field_hockey_game_team_stats(
         game_id=2312967
     )
     print(df)
@@ -2276,6 +2277,76 @@ def get_field_hockey_raw_pbp(game_id: int) -> pd.DataFrame:
     Usage
     ----------
     ```python
+
+    from ncaa_stats_py.field_hockey import get_field_hockey_raw_pbp
+
+
+    # Get the play-by-play data of the
+    # 2024 NCAA D1 Field Hockey National Championship game.
+    print(
+        "Get the play-by-play data of the "
+        + "2024 NCAA D1 Field Hockey National Championship game."
+    )
+    df = get_field_hockey_raw_pbp(5835105)
+    print(df)
+
+    # Get the play-by-play data of a September 22nd, 2024
+    # game between the Saint Joseph's Hawks and the Duke Blue Devils.
+    print(
+        "Get the play-by-play data of a September 22nd, 2024 "
+        + "game between the Saint Joseph's Hawks and the Duke Blue Devils."
+    )
+    df = get_field_hockey_raw_pbp(5685953)
+    print(df)
+
+    # Get the play-by-play data of a double overtime game
+    # between the Syracuse Orange and the North Carolina Tar Heels
+    # on September 23rd, 2016.
+    print(
+        "Get the play-by-play data of a double overtime game "
+        "between the Syracuse Orange and the North Carolina Tar Heels "
+        + "on September 23rd, 2016."
+    )
+    df = get_field_hockey_raw_pbp(157178)
+    print(df)
+
+    # Get the play-by-play data of a March 28th, 2021
+    # game between a Ohio State Buckyes team and the Northwestern Wildcats.
+    print(
+        "Get the play-by-play data of a March 28th, 2021 "
+        + "game between a Ohio State Buckyes team "
+        + "and the Northwestern Wildcats."
+    )
+    df = get_field_hockey_raw_pbp(2034526)
+    print(df)
+
+    # Get the play-by-play data of a November 1st, 2024 game
+    # between the Central Michigan Chippewas and the Ohio Bobcats.
+    print(
+        "Get the play-by-play data of a November 1st, 2024 game "
+        + "between the Central Michigan Chippewas and the Ohio Bobcats."
+    )
+    df = get_field_hockey_raw_pbp(5687288)
+    print(df)
+
+    # Get the play-by-play data of a September 2nd, 2023 game
+    # between the Saint Michael's Purple Knights and the Kutztown Golden Bears.
+    print(
+        "Get the play-by-play data of a September 2nd, 2023 game "
+        + "between the Saint Michael's Purple Knights "
+        + "and the Kutztown Golden Bears."
+    )
+    df = get_field_hockey_raw_pbp(3483126)
+    print(df)
+
+    # Get the play-by-play data of an October 1st, 2022 game
+    # between the Gwynedd Mercy Griffins and the Keystone Giants.
+    print(
+        "Get the play-by-play data of an October 1st, 2022 game "
+        + "between the Gwynedd Mercy Griffins and the Keystone Giants."
+    )
+    df = get_field_hockey_raw_pbp(2313570)
+    print(df)
 
     ```
     Returns
@@ -2472,9 +2543,10 @@ def get_field_hockey_raw_pbp(game_id: int) -> pd.DataFrame:
         )
 
         quarter_num = int(quarter_num[0])
+
         if "ot" in half_str.lower():
             is_overtime = True
-            quarter_num += 2
+            quarter_num += 4
         table_body = card.find("table").find("tbody").find_all("tr")
 
         for row in table_body:
@@ -2601,27 +2673,53 @@ def get_field_hockey_raw_pbp(game_id: int) -> pd.DataFrame:
                         (900 * 4) -
                         ((temp_time_minutes * 60) + temp_time_seconds)
                     )
-                else:
+                elif quarter_num == 5:
                     # Starting in 2018, Field hockey overtimes
                     # were reduced from 15 minute periods,
                     # to 10 minute periods.
                     # https://www.ncaa.com/news/fieldhockey/article/2018-06-13/overtime-length-reduced-two-10-minute-periods-ncaa-field-hockey
                     quarter_seconds_remaining = (
-                        2700 + 600 -
+                        (900 * 4) + 600 -
                         ((temp_time_minutes * 60) + temp_time_seconds)
                     )
                     half_seconds_remaining = (
-                        2700 + 600 -
+                        (900 * 4) + 1200 -
                         ((temp_time_minutes * 60) + temp_time_seconds)
                     )
                     game_seconds_remaining = (
-                        2700 + 600 -
+                        (900 * 4) + 1200 -
                         ((temp_time_minutes * 60) + temp_time_seconds)
                     )
+                elif quarter_num == 6:
+                    quarter_seconds_remaining = (
+                        (900 * 4) + 1200 -
+                        ((temp_time_minutes * 60) + temp_time_seconds)
+                    )
+                    half_seconds_remaining = (
+                        (900 * 4) + 1200 -
+                        ((temp_time_minutes * 60) + temp_time_seconds)
+                    )
+                    game_seconds_remaining = (
+                        (900 * 4) + 1200 -
+                        ((temp_time_minutes * 60) + temp_time_seconds)
+                    )
+                # else:
+                #     quarter_seconds_remaining = (
+                #         2700 + 1200 -
+                #         ((temp_time_minutes * 60) + temp_time_seconds)
+                #     )
+                #     half_seconds_remaining = (
+                #         2700 + 1200 -
+                #         ((temp_time_minutes * 60) + temp_time_seconds)
+                #     )
+                #     game_seconds_remaining = (
+                #         2700 + 1200 -
+                #         ((temp_time_minutes * 60) + temp_time_seconds)
+                #     )
 
-                    if quarter_num == 5:
-                        half_seconds_remaining += 600
-                        game_seconds_remaining += 600
+                #     if quarter_num == 5:
+                #         half_seconds_remaining += 600
+                #         game_seconds_remaining += 600
             elif season <= 2018:
                 if quarter_num == 1:
                     quarter_seconds_remaining = (
