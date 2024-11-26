@@ -7,6 +7,7 @@
 # - 2024-09-19 04:30 PM EDT
 # - 2024-09-23 10:30 PM EDT
 # - 2024-11-01 12:10 AM EDT
+# - 2024-11-25 07:45 PM EDT
 
 
 import logging
@@ -635,7 +636,10 @@ def get_baseball_team_schedule(team_id: int) -> pd.DataFrame:
             del opp_text
 
             score = cells[2].text.strip()
-            if (
+            if len(score) == 0:
+                score_1 = 0
+                score_2 = 0
+            elif (
                 "canceled" not in score.lower() and
                 "ppd" not in score.lower()
             ):
@@ -1448,7 +1452,7 @@ def get_baseball_player_season_batting_stats(
 
     stats_df.rename(
         columns={
-            "#": "player_jersey_num",
+            "#": "player_jersey_number",
             "Player": "player_full_name",
             "Yr": "player_class",
             "Pos": "player_position",
@@ -1733,7 +1737,7 @@ def get_baseball_player_season_pitching_stats(
 
     stats_df.rename(
         columns={
-            "#": "player_jersey_num",
+            "#": "player_jersey_number",
             "Player": "player_full_name",
             "Yr": "player_class",
             "Pos": "player_position",
@@ -2036,7 +2040,7 @@ def get_baseball_player_season_fielding_stats(
 
     stats_df.rename(
         columns={
-            "#": "player_jersey_num",
+            "#": "player_jersey_number",
             "Player": "player_full_name",
             "Yr": "player_class",
             "Pos": "player_position",
@@ -3262,7 +3266,7 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
         "team_id",
         "player_id",
         "player_jersey_number",
-        "player_name",
+        "player_full_name",
         "player_positions",
         # Batting
         "batting_G",
@@ -3427,6 +3431,7 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
                     "Could not replace player IDs. " +
                     f"Full exception: `{e}`"
                 )
+                player_id = team_id * -1
 
             t_cells = t.find_all("td")
             p_name = t_cells[1].text.replace("\n", "")
@@ -3449,6 +3454,11 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
             ignore_index=True
         )
         spec_stats_df["team_id"] = team_id
+        spec_stats_df = spec_stats_df[
+            (spec_stats_df["player_id"] > 0) |
+            (spec_stats_df["Name"] == "TEAM")
+        ]
+
         if (
             "batting" in t_header_str.lower() or
             "hitting" in t_header_str.lower()
@@ -3466,7 +3476,7 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
     batting_df.rename(
         columns={
             "#": "player_jersey_number",
-            "Name": "player_name",
+            "Name": "player_full_name",
             "P": "player_positions",
             "GP": "batting_G",
             "GS": "batting_GS",
@@ -3513,7 +3523,7 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
     pitching_df.rename(
         columns={
             "#": "player_jersey_number",
-            "Name": "player_name",
+            "Name": "player_full_name",
             "P": "player_positions",
             "IP": "pitching_IP",
             "IP_str": "pitching_IP_str",
@@ -3559,7 +3569,7 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
     fielding_df.rename(
         columns={
             "#": "player_jersey_number",
-            "Name": "player_name",
+            "Name": "player_full_name",
             "P": "player_positions",
             "GP": "fielding_G",
             "GS": "fielding_GS",
@@ -3588,7 +3598,7 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
         right=pitching_df,
         on=[
             'player_jersey_number',
-            'player_name',
+            'player_full_name',
             'player_positions',
             'player_id',
             "team_id",
@@ -3601,7 +3611,7 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
         right=fielding_df,
         on=[
             'player_jersey_number',
-            'player_name',
+            'player_full_name',
             'player_positions',
             'player_id',
             "team_id",
@@ -3630,66 +3640,66 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
             "team_id": "int64",
             "player_id": "int64",
             "player_jersey_number": "string",
-            "player_name": "string",
+            "player_full_name": "string",
             "player_positions": "string",
-            "batting_G": "uint8",
-            "batting_GS": "uint8",
-            "batting_R": "uint8",
-            "batting_AB": "uint8",
-            "batting_H": "uint8",
-            "batting_2B": "uint8",
-            "batting_3B": "uint8",
-            "batting_TB": "uint8",
-            "batting_HR": "uint8",
-            "batting_RBI": "uint8",
-            "batting_BB": "uint8",
-            "batting_HBP": "uint8",
-            "batting_SF": "uint8",
-            "batting_SH": "uint8",
-            "batting_SO": "uint8",
-            "batting_OPP_DP": "uint8",
-            "batting_CS": "uint8",
-            "batting_PK": "uint8",
-            "batting_SB": "uint8",
-            "batting_IBB": "uint8",
-            "batting_KL": "uint8",
-            "pitching_GP": "uint8",
-            "pitching_GS": "uint8",
+            "batting_G": "uint16",
+            "batting_GS": "uint16",
+            "batting_R": "uint16",
+            "batting_AB": "uint16",
+            "batting_H": "uint16",
+            "batting_2B": "uint16",
+            "batting_3B": "uint16",
+            "batting_TB": "uint16",
+            "batting_HR": "uint16",
+            "batting_RBI": "uint16",
+            "batting_BB": "uint16",
+            "batting_HBP": "uint16",
+            "batting_SF": "uint16",
+            "batting_SH": "uint16",
+            "batting_SO": "uint16",
+            "batting_OPP_DP": "uint16",
+            "batting_CS": "uint16",
+            "batting_PK": "uint16",
+            "batting_SB": "uint16",
+            "batting_IBB": "uint16",
+            "batting_KL": "uint16",
+            "pitching_GP": "uint16",
+            "pitching_GS": "uint16",
             "pitching_IP": "float16",
             "pitching_IP_str": "string",
-            "pitching_H": "uint8",
-            "pitching_R": "uint8",
-            "pitching_ER": "uint8",
-            "pitching_BB": "uint8",
-            "pitching_SO": "uint8",
-            "pitching_BF": "uint8",
-            "pitching_2B": "uint8",
-            "pitching_3B": "uint8",
-            "pitching_BK": "uint8",
-            "pitching_HR": "uint8",
-            "pitching_WP": "uint8",
-            "pitching_HBP": "uint8",
-            "pitching_IBB": "uint8",
-            "pitching_IR": "uint8",
-            "pitching_IRS": "uint8",
-            "pitching_SH": "uint8",
-            "pitching_SF": "uint8",
-            "pitching_KL": "uint8",
-            "pitching_TUER": "uint8",
-            "pitching_PK": "uint8",
-            "pitching_order_appeared": "uint8",
-            "fielding_G": "uint8",
-            "fielding_GS": "uint8",
-            "fielding_PO": "uint8",
-            "fielding_A": "uint8",
-            "fielding_TC": "uint8",
-            "fielding_E": "uint8",
-            "fielding_CI": "uint8",
-            "fielding_PB": "uint8",
-            "fielding_SBA": "uint8",
-            "fielding_CSB": "uint8",
-            "fielding_IDP": "uint8",
-            "fielding_TP": "uint8",
+            "pitching_H": "uint16",
+            "pitching_R": "uint16",
+            "pitching_ER": "uint16",
+            "pitching_BB": "uint16",
+            "pitching_SO": "uint16",
+            "pitching_BF": "uint16",
+            "pitching_2B": "uint16",
+            "pitching_3B": "uint16",
+            "pitching_BK": "uint16",
+            "pitching_HR": "uint16",
+            "pitching_WP": "uint16",
+            "pitching_HBP": "uint16",
+            "pitching_IBB": "uint16",
+            "pitching_IR": "uint16",
+            "pitching_IRS": "uint16",
+            "pitching_SH": "uint16",
+            "pitching_SF": "uint16",
+            "pitching_KL": "uint16",
+            "pitching_TUER": "uint16",
+            "pitching_PK": "uint16",
+            "pitching_order_appeared": "uint16",
+            "fielding_G": "uint16",
+            "fielding_GS": "uint16",
+            "fielding_PO": "uint16",
+            "fielding_A": "uint16",
+            "fielding_TC": "uint16",
+            "fielding_E": "uint16",
+            "fielding_CI": "uint16",
+            "fielding_PB": "uint16",
+            "fielding_SBA": "uint16",
+            "fielding_CSB": "uint16",
+            "fielding_IDP": "uint16",
+            "fielding_TP": "uint16",
             "fielding_SBA%": "float16",
         }
     )

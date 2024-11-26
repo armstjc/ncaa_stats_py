@@ -1,10 +1,38 @@
 # `ncaa_stats_py` Changelog
 
+## 0.0.3: The "Field Hockey" update
+- Implemented `ncaa_stats_py.field_hockey.get_field_hockey_teams()`, a function that allows one to get a list of all field hockey teams given a season and a NCAA level.
+- Implemented `ncaa_stats_py.field_hockey.load_field_hockey_teams()`, a function that allows one to load in every field hockey team from a starting year (default is 2009) to present day.
+- Implemented `ncaa_stats_py.field_hockey.get_field_hockey_team_schedule()`, a function that allows you to get a schedule for a specific field hockey team.
+- Implemented `ncaa_stats_py.field_hockey.get_full_field_hockey_schedule()`, a function that builds on top of `ncaa_stats_py.field_hockey.get_field_hockey_team_schedule()` and allows you to get the entire field hockey schedule for a given season and level.
+- Implemented `ncaa_stats_py.field_hockey.get_field_hockey_team_roster()`, a function that allows one to get a full team roster from a given team ID.
+- Implemented `ncaa_stats_py.field_hockey.get_field_hockey_player_season_stats()`, a function that allows one to get a the season stats of players from a team through their team ID.
+- Implemented `ncaa_stats_py.field_hockey.get_field_hockey_player_game_stats()`, a function that allows one to get a the game stats of a player given a season, and player ID.
+- Implemented `ncaa_stats_py.field_hockey.get_field_hockey_game_player_stats()`, a function that allows one to get a the game stats of a player given a valid game ID.
+- Implemented `ncaa_stats_py.field_hockey.get_field_hockey_game_team_stats()`, a function that allows one to get a the team game stats given a valid game ID.
+- Implemented `ncaa_stats_py.field_hockey.get_field_hockey_raw_pbp()`, to parse play-by-play data, and normalize the data into something that can be parsed at a later date.
+- Implemented `ncaa_stats_py.utils._get_seconds_from_time_str()` to convert an `"MM:SS"` time string into an integer.
+    > EXAMPLE: 
+    > Given a string of `"60:01"`, the function would split the string into `"60"` and `"01"`, converting the two into integers (`60` and `1`), multiplying the "minutes" by 60 (`60 * 60 = 2,700`), and then adding any additional seconds left, which is `1` in this case.
+    > Meaning, that the returned integer would be `2,701` in this case.
+- Redesigned `ncaa_stats_py.utils._stat_id_dict()` to no longer have a `year_id` option within the dictionary.
+- Preemptively fixed a potential rounding issue when counting the number of triple doubles and double doubles a player has in `ncaa_stats_py.basketball.get_basketball_game_player_stats()`.
+- Fixed a rounding issue found in `ncaa_stats_py.basketball.get_basketball_player_season_stats()` when calculating the total number of seconds a player spent on a court in a game. 
+- For `ncaa_stats_py.baseball.get_baseball_game_player_stats()`, any columns previously set to be an unsigned 8-bit integer (`uint8`) has now been set to an unsigned 16-bit integer (`uint16`)
+- For `ncaa_stats_py.baseball.get_baseball_game_player_stats()`, any stats that are associated to the team specifically, and not to any player, will have those stats set to a player ID equal to the negative of that team's ID. Previously, `[player_id]` would have been a null value.
+    > EXAMPLE: 
+    > Team A has a team ID of `123`. If there are stats associated to Team A specifically, and not to any player, those stats will appear in a row where `[player_id]` is set to `-123`.
+- For baseball and basketball related functions, the `[player_name]` column has been renamed to `[player_full_name]`.
+- For baseball and basketball related functions, the `[player_jersey_num]` column has been renamed to `[player_jersey_num]`.
+- Fixed an edge case found in `ncaa_stats_py.baseball.get_baseball_team_schedule()` and `ncaa_stats_py.basketball.get_basketball_team_schedule()` which would cause the function to crash if a scheduled game had an unknown result.
+- Set the package version to `0.0.3`.
+
+
 ## 0.0.2: The "Basketball" update
 - Implemented `ncaa_stats_py.basketball.get_basketball_teams()`, a function that allows one to get a list of all men's basketball (MBB) or women's basketball (WBB) teams given a season and a NCAA level.
 - Implemented `ncaa_stats_py.basketball.load_basketball_teams()`, a function that allows one to load in every basketball team from a starting year (default is 2011) to present day.
 - Implemented `ncaa_stats_py.basketball.get_basketball_team_schedule()`, a function that allows you to get a schedule for a specific basketball team.
-- Implemented `ncaa_stats_py.basketball.get_full_basketball_schedule()`, a function that builds on top of `ncaa_stats_py.basketball.get_baseball_team_schedule()` and allows you to get the entire basketball schedule for a given season and level.
+- Implemented `ncaa_stats_py.basketball.get_full_basketball_schedule()`, a function that builds on top of `ncaa_stats_py.basketball.get_basketball_team_schedule()` and allows you to get the entire basketball schedule for a given season and level.
 - Implemented `ncaa_stats_py.basketball.get_basketball_team_roster()`, a function that allows one to get a full team roster from a given team ID.
 - Implemented `ncaa_stats_py.basketball.get_basketball_player_season_stats()`, a function that allows one to get a the season stats of players from a team through their team ID.
 - Implemented `ncaa_stats_py.basketball.get_basketball_player_game_stats()`, a function that allows one to get a the game stats of a player given a season, and player ID.
