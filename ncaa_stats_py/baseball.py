@@ -177,51 +177,6 @@ def get_baseball_teams(season: int, level: str | int) -> pd.DataFrame:
         + "re-downloading that list of schools now."
     )
     schools_df = _get_schools()
-    # Cannot do this method because stats.ncaa.org can't figure out how
-    # to do team season stats for multiple seasons.
-
-    # url = "https://stats.ncaa.org/rankings/institution_trends?" +\
-    #     f"academic_year={season}.0&division={ncaa_level}.0&sport_code=MBA"
-    # response = get_webpage(url=url)
-    # with open("test.html", "w+") as f:
-    #     f.write(response.text)
-    # soup = BeautifulSoup(response.text, features='lxml')
-    # soup = soup.find(
-    #     "table",
-    #     {
-    #         "id": "stat_grid"
-    #     },
-    # )
-    # soup = soup.find("tbody")
-    # t_rows = soup.find_all("tr")
-
-    # for i in range(0, len(t_rows)):
-    #     data = t_rows[i]
-    #     team_id = data.find(
-    #         "a",
-    #         {"target": "TEAM_WIN", "class": "skipMask"}
-    #     )
-    #     team_name = team_id.text
-    #     team_id = team_id.get("href")
-
-    #     team_id = team_id.replace("/teams/", "")
-    #     team_id = int(team_id)
-
-    #     conference_name = data.find_all("td")[1].text
-
-    #     temp_df = pd.DataFrame(
-    #         {
-    #             "season": season,
-    #             "ncaa_division_id": ncaa_level,
-    #             "ncaa_division_name": formatted_level,
-    #             "team_id": team_id,
-    #             "team_name": team_name,
-    #             "conference_name": conference_name,
-    #         },
-    #         index=[0]
-    #     )
-    #     teams_df_arr.append(temp_df)
-    #     del temp_df
     url = (
         "https://stats.ncaa.org/rankings/change_sport_year_div?"
         + f"academic_year={season}.0&division={ncaa_level}.0&sport_code=MBA"
@@ -250,44 +205,100 @@ def get_baseball_teams(season: int, level: str | int) -> pd.DataFrame:
                 break
 
     url = (
-        "https://stats.ncaa.org/rankings/national_ranking?"
+        "https://stats.ncaa.org/rankings/institution_trends?"
         + f"academic_year={season}.0&division={ncaa_level}.0&"
-        + f"ranking_period={rp_value}&sport_code=MBA&stat_seq=484.0"
+        + f"ranking_period={rp_value}&sport_code={sport_id}"
+        + "&stat_seq=484.0"
     )
 
-    response = _get_webpage(url=url)
-    # with open("test.html", "w+") as f:
-    #     f.write(response.text)
-    soup = BeautifulSoup(response.text, features="lxml")
-    soup = soup.find(
-        "table",
-        {"id": "rankings_table"},
-    )
-    soup = soup.find("tbody")
-    t_rows = soup.find_all("tr")
+    best_method = True
 
-    for t in t_rows:
-        team_id = t.find("a")
-        team_id = team_id.get("href")
-        team_id = team_id.replace("/teams/", "")
-        team_id = int(team_id)
-        team = t.find_all("td")[1].get("data-order")
-        team_name, team_conference_name = team.split(",")
-        del team
-        temp_df = pd.DataFrame(
-            {
-                "season": season,
-                "ncaa_division": ncaa_level,
-                "ncaa_division_formatted": formatted_level,
-                "team_conference_name": team_conference_name,
-                "team_id": team_id,
-                "school_name": team_name,
-                "sport_id": sport_id
-            },
-            index=[0],
+    if season < 2013:
+        url = (
+            "https://stats.ncaa.org/rankings/national_ranking?"
+            + f"academic_year={season}.0&division={ncaa_level}.0&"
+            + f"ranking_period={rp_value}&sport_code={sport_id}"
+            + "&stat_seq=484.0"
         )
-        teams_df_arr.append(temp_df)
-        del temp_df
+        response = _get_webpage(url=url)
+        best_method = False
+    else:
+        try:
+            response = _get_webpage(url=url)
+        except Exception as e:
+            logging.info(f"Found exception when loading teams `{e}`")
+            logging.info("Attempting backup method.")
+            url = (
+                "https://stats.ncaa.org/rankings/national_ranking?"
+                + f"academic_year={season}.0&division={ncaa_level}.0&"
+                + f"ranking_period={rp_value}&sport_code={sport_id}"
+                + "&stat_seq=484.0"
+            )
+            response = _get_webpage(url=url)
+            best_method = False
+
+    soup = BeautifulSoup(response.text, features="lxml")
+
+    if best_method is True:
+        soup = soup.find(
+            "table",
+            {"id": "stat_grid"},
+        )
+        soup = soup.find("tbody")
+        t_rows = soup.find_all("tr")
+
+        for t in t_rows:
+            team_id = t.find("a")
+            team_id = team_id.get("href")
+            team_id = team_id.replace("/teams/", "")
+            team_id = int(team_id)
+            team_name = t.find_all("td")[0].text
+            team_conference_name = t.find_all("td")[1].text
+            # del team
+            temp_df = pd.DataFrame(
+                {
+                    "season": season,
+                    "ncaa_division": ncaa_level,
+                    "ncaa_division_formatted": formatted_level,
+                    "team_conference_name": team_conference_name,
+                    "team_id": team_id,
+                    "school_name": team_name,
+                    "sport_id": sport_id,
+                },
+                index=[0],
+            )
+            teams_df_arr.append(temp_df)
+            del temp_df
+    else:
+        soup = soup.find(
+            "table",
+            {"id": "rankings_table"},
+        )
+        soup = soup.find("tbody")
+        t_rows = soup.find_all("tr")
+
+        for t in t_rows:
+            team_id = t.find("a")
+            team_id = team_id.get("href")
+            team_id = team_id.replace("/teams/", "")
+            team_id = int(team_id)
+            team = t.find_all("td")[1].get("data-order")
+            team_name, team_conference_name = team.split(",")
+            del team
+            temp_df = pd.DataFrame(
+                {
+                    "season": season,
+                    "ncaa_division": ncaa_level,
+                    "ncaa_division_formatted": formatted_level,
+                    "team_conference_name": team_conference_name,
+                    "team_id": team_id,
+                    "school_name": team_name,
+                    "sport_id": sport_id,
+                },
+                index=[0],
+            )
+            teams_df_arr.append(temp_df)
+            del temp_df
 
     teams_df = pd.concat(teams_df_arr, ignore_index=True)
     teams_df = pd.merge(

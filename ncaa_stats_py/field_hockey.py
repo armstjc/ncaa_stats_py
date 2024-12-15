@@ -179,48 +179,98 @@ def get_field_hockey_teams(season: int, level: str | int) -> pd.DataFrame:
                 break
 
     url = (
-        "https://stats.ncaa.org/rankings/national_ranking?"
+        "https://stats.ncaa.org/rankings/institution_trends?"
         + f"academic_year={season+1}.0&division={ncaa_level}.0&"
         + f"ranking_period={rp_value}&sport_code={sport_id}"
         + f"&stat_seq={stat_sequence}"
     )
 
-    response = _get_webpage(url=url)
-    # with open("test.html", "w+") as f:
-    #     f.write(response.text)
-    soup = BeautifulSoup(response.text, features="lxml")
-    soup = soup.find(
-        "table",
-        {"id": "rankings_table"},
-    )
-    soup = soup.find("tbody")
-    t_rows = soup.find_all("tr")
-
-    for t in t_rows:
-        team_id = t.find("a")
-        team_id = team_id.get("href")
-        team_id = team_id.replace("/teams/", "")
-        team_id = int(team_id)
-        team = t.find_all("td")[1].get("data-order")
-        team_name, team_conference_name = team.split(",")
-        del team
-        temp_df = pd.DataFrame(
-            {
-                "season": season,
-                "ncaa_division": ncaa_level,
-                "ncaa_division_formatted": formatted_level,
-                "team_conference_name": team_conference_name,
-                "team_id": team_id,
-                "school_name": team_name,
-                "sport_id": sport_id,
-            },
-            index=[0],
+    best_method = True
+    if season < 2013:
+        url = (
+            "https://stats.ncaa.org/rankings/national_ranking?"
+            + f"academic_year={season+1}.0&division={ncaa_level}.0&"
+            + f"ranking_period={rp_value}&sport_code={sport_id}"
+            + f"&stat_seq={stat_sequence}"
         )
-        teams_df_arr.append(temp_df)
-        del temp_df
+        response = _get_webpage(url=url)
+        best_method = False
+    else:
+        try:
+            response = _get_webpage(url=url)
+        except Exception as e:
+            logging.info(f"Found exception when loading teams `{e}`")
+            logging.info("Attempting backup method.")
+            url = (
+                "https://stats.ncaa.org/rankings/national_ranking?"
+                + f"academic_year={season+1}.0&division={ncaa_level}.0&"
+                + f"ranking_period={rp_value}&sport_code={sport_id}"
+                + f"&stat_seq={stat_sequence}"
+            )
+            response = _get_webpage(url=url)
+            best_method = False
+    soup = BeautifulSoup(response.text, features="lxml")
 
-    # if len(teams_df_arr) == 0:
-    #     return pd.DataFrame()
+    if best_method is True:
+        soup = soup.find(
+            "table",
+            {"id": "stat_grid"},
+        )
+        soup = soup.find("tbody")
+        t_rows = soup.find_all("tr")
+
+        for t in t_rows:
+            team_id = t.find("a")
+            team_id = team_id.get("href")
+            team_id = team_id.replace("/teams/", "")
+            team_id = int(team_id)
+            team_name = t.find_all("td")[0].text
+            team_conference_name = t.find_all("td")[1].text
+            # del team
+            temp_df = pd.DataFrame(
+                {
+                    "season": season,
+                    "ncaa_division": ncaa_level,
+                    "ncaa_division_formatted": formatted_level,
+                    "team_conference_name": team_conference_name,
+                    "team_id": team_id,
+                    "school_name": team_name,
+                    "sport_id": sport_id,
+                },
+                index=[0],
+            )
+            teams_df_arr.append(temp_df)
+            del temp_df
+    else:
+        soup = soup.find(
+            "table",
+            {"id": "rankings_table"},
+        )
+        soup = soup.find("tbody")
+        t_rows = soup.find_all("tr")
+
+        for t in t_rows:
+            team_id = t.find("a")
+            team_id = team_id.get("href")
+            team_id = team_id.replace("/teams/", "")
+            team_id = int(team_id)
+            team = t.find_all("td")[1].get("data-order")
+            team_name, team_conference_name = team.split(",")
+            del team
+            temp_df = pd.DataFrame(
+                {
+                    "season": season,
+                    "ncaa_division": ncaa_level,
+                    "ncaa_division_formatted": formatted_level,
+                    "team_conference_name": team_conference_name,
+                    "team_id": team_id,
+                    "school_name": team_name,
+                    "sport_id": sport_id,
+                },
+                index=[0],
+            )
+            teams_df_arr.append(temp_df)
+            del temp_df
 
     teams_df = pd.concat(teams_df_arr, ignore_index=True)
     teams_df = pd.merge(
@@ -1759,12 +1809,14 @@ def get_field_hockey_player_game_stats(
 
         init_df_arr.append(temp_df)
         del temp_df
+
     init_df = pd.concat(init_df_arr, ignore_index=True)
     init_df = init_df.replace("/", "", regex=True)
     init_df = init_df.replace("", np.nan)
     init_df = init_df.infer_objects()
 
     # print(stats_df)
+    init_df["GP"] = init_df["GP"].fillna("0")
     init_df = init_df.astype(
         {"GP": "uint8"}
     )
@@ -2025,7 +2077,7 @@ def get_field_hockey_game_player_stats(game_id: int) -> pd.DataFrame:
             (spec_stats_df["player_id"] > 0) |
             (spec_stats_df["Name"] == "TEAM")
         ]
-        
+
         df = team_df[team_df["team_id"] == team_id]
         season = df["season"].iloc[0]
         del df
@@ -2164,7 +2216,7 @@ def get_field_hockey_game_player_stats(game_id: int) -> pd.DataFrame:
     return stats_df
 
 
-def get_basketball_game_team_stats(game_id: int) -> pd.DataFrame:
+def get_field_hockey_game_team_stats(game_id: int) -> pd.DataFrame:
     """
     Given a valid game ID,
     this function will attempt to get all team game stats, if possible.
@@ -2703,23 +2755,6 @@ def get_field_hockey_raw_pbp(game_id: int) -> pd.DataFrame:
                         (900 * 4) + 1200 -
                         ((temp_time_minutes * 60) + temp_time_seconds)
                     )
-                # else:
-                #     quarter_seconds_remaining = (
-                #         2700 + 1200 -
-                #         ((temp_time_minutes * 60) + temp_time_seconds)
-                #     )
-                #     half_seconds_remaining = (
-                #         2700 + 1200 -
-                #         ((temp_time_minutes * 60) + temp_time_seconds)
-                #     )
-                #     game_seconds_remaining = (
-                #         2700 + 1200 -
-                #         ((temp_time_minutes * 60) + temp_time_seconds)
-                #     )
-
-                #     if quarter_num == 5:
-                #         half_seconds_remaining += 600
-                #         game_seconds_remaining += 600
             elif season <= 2018:
                 if quarter_num == 1:
                     quarter_seconds_remaining = (
