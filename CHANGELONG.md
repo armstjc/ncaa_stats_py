@@ -1,5 +1,26 @@
 # `ncaa_stats_py` Changelog
 
+## 0.0.4: The "Hockey" update
+- Implemented `ncaa_stats_py.hockey.get_hockey_teams()`, a function that allows one to get a list of all hockey teams given a season and a NCAA level.
+- Implemented `ncaa_stats_py.hockey.load_hockey_teams()`, a function that allows one to load in every hockey team from a starting year (default is 2009) to present day.
+- Implemented `ncaa_stats_py.hockey.get_hockey_team_schedule()`, a function that allows you to get a schedule for a specific hockey team.
+- Implemented `ncaa_stats_py.hockey.get_full_hockey_schedule()`, a function that builds on top of `ncaa_stats_py.hockey.get_hockey_team_schedule()` and allows you to get the entire hockey schedule for a given season and level.
+- Implemented `ncaa_stats_py.hockey.get_hockey_team_roster()`, a function that allows one to get a full team roster from a given team ID.
+- Implemented `ncaa_stats_py.hockey.get_hockey_player_season_stats()`, a function that allows one to get a the season stats of players from a team through their team ID.
+- Implemented `ncaa_stats_py.hockey.get_hockey_player_game_stats()`, a function that allows one to get a the game stats of a player given a season, and player ID.
+- Implemented `ncaa_stats_py.hockey.get_hockey_game_player_stats()`, a function that allows one to get a the game stats of a player given a valid game ID.
+- Implemented `ncaa_stats_py.hockey.get_hockey_game_team_stats()`, a function that allows one to get a the team game stats given a valid game ID.
+- Implemented `ncaa_stats_py.hockey.get_hockey_raw_pbp()`, to parse play-by-play data, and normalize the data into something that can be parsed at a later date.
+- For `ncaa_stats_py.baseball.get_basketball_raw_pbp()`, additional logic has been added to parse time formatted as `"MM:SS"` as well as `"MM:SS:ms"`.
+- Renamed `ncaa_stats_py.field_hockey.get_baseball_game_team_stats()` to `ncaa_stats_py.field_hockey.get_field_hockey_game_team_stats()`
+- Fixed the logic in `ncaa_stats_py.field_hockey.get_field_hockey_player_game_stats()` to catch a potential edge case where a player is acknowledge to exist on a field hockey team, but has absolutely zero games played.
+- Added additional logic to the following functions to improve the ability to get teams that are transitioning up a level within the NCAA division structure:
+    - `ncaa_stats_py.baseball.get_baseball_teams()`
+    - `ncaa_stats_py.basketball.get_basketball_teams()`
+    - `ncaa_stats_py.field_hockey.get_field_hockey_teams()`
+- Set the package version to `0.0.3`.
+
+
 ## 0.0.3: The "Field Hockey" update
 - Implemented `ncaa_stats_py.field_hockey.get_field_hockey_teams()`, a function that allows one to get a list of all field hockey teams given a season and a NCAA level.
 - Implemented `ncaa_stats_py.field_hockey.load_field_hockey_teams()`, a function that allows one to load in every field hockey team from a starting year (default is 2009) to present day.

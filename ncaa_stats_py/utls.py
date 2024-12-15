@@ -257,7 +257,111 @@ def _stat_id_dict() -> dict:
                 "goalkeepers": 15503,
                 "non_goalkeepers": 15502
             },
-        }
+        },
+        "mens_hockey": {  # MIH
+            2025: {
+                "season": 2025,
+                "goalkeepers": 15581,
+                "non_goalkeepers": 15580
+            },
+            2024: {
+                "season": 2024,
+                "goalkeepers": 15189,
+                "non_goalkeepers": 15188
+            },
+            2023: {
+                "season": 2023,
+                "goalkeepers": 15565,
+                "non_goalkeepers": 15564
+            },
+            2022: {
+                "season": 2022,
+                "goalkeepers": 15567,
+                "non_goalkeepers": 15566
+            },
+            2021: {
+                "season": 2021,
+                "goalkeepers": 15569,
+                "non_goalkeepers": 15568
+            },
+            2020: {
+                "season": 2020,
+                "goalkeepers": 15571,
+                "non_goalkeepers": 15570
+            },
+            2019: {
+                "season": 2019,
+                "goalkeepers": 15573,
+                "non_goalkeepers": 15572
+            },
+            2018: {
+                "season": 2018,
+                "goalkeepers": 15575,
+                "non_goalkeepers": 15574
+            },
+            2017: {
+                "season": 2017,
+                "goalkeepers": 15579,
+                "non_goalkeepers": 15578
+            },
+            2016: {
+                "season": 2016,
+                "goalkeepers": 15577,
+                "non_goalkeepers": 15576
+            },
+        },
+        "womens_hockey": {  # WIH
+            2025: {
+                "season": 2025,
+                "goalkeepers": 15599,
+                "non_goalkeepers": 15598
+            },
+            2024: {
+                "season": 2024,
+                "goalkeepers": 15599,
+                "non_goalkeepers": 15598
+            },
+            2023: {
+                "season": 2023,
+                "goalkeepers": 15583,
+                "non_goalkeepers": 15582
+            },
+            2022: {
+                "season": 2022,
+                "goalkeepers": 15585,
+                "non_goalkeepers": 15584
+            },
+            2021: {
+                "season": 2021,
+                "goalkeepers": 15587,
+                "non_goalkeepers": 15586
+            },
+            2020: {
+                "season": 2020,
+                "goalkeepers": 15589,
+                "non_goalkeepers": 15588
+            },
+            2019: {
+                "season": 2019,
+                "goalkeepers": 15591,
+                "non_goalkeepers": 15590
+            },
+            2018: {
+                "season": 2018,
+                "goalkeepers": 15593,
+                "non_goalkeepers": 15592
+            },
+            2017: {
+                "season": 2017,
+                "goalkeepers": 15595,
+                "non_goalkeepers": 15594
+            },
+            2016: {
+                "season": 2016,
+                "goalkeepers": 15597,
+                "non_goalkeepers": 15596
+            },
+        },
     }
     return stat_id_dict
 
@@ -275,7 +379,7 @@ def _get_webpage(url: str) -> requests.Response:
     """ """
     rng = SystemRandom()
     headers = _web_headers()
-    response = requests.get(headers=headers, url=url, timeout=10)
+    response = requests.get(headers=headers, url=url, timeout=20)
     random_integer = 5 + rng.randint(a=0, b=5)
     time.sleep(random_integer)
     if response.status_code == 200:

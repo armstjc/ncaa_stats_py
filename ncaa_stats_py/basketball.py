@@ -227,8 +227,7 @@ def get_basketball_teams(
 
     if (
         age.days >= 14 and
-        season >= (now.year - 1) and
-        now.month <= 7
+        season >= (now.year - 1)
     ):
         load_from_cache = False
 
@@ -256,58 +255,122 @@ def get_basketball_teams(
     found_value = False
 
     while found_value is False:
+        # print("check")
         for rp in ranking_periods:
             if "final " in rp.text.lower():
                 rp_value = rp.get("value")
                 found_value = True
                 break
-            elif "-" in rp.text:
-                pass
             else:
                 rp_value = rp.get("value")
                 found_value = True
                 break
 
     url = (
-        "https://stats.ncaa.org/rankings/national_ranking?"
+        "https://stats.ncaa.org/rankings/institution_trends?"
         + f"academic_year={season}.0&division={ncaa_level}.0&"
-        + f"ranking_period={rp_value}&sport_code={sport_id}" +
-        f"&stat_seq={stat_sequence}"
+        + f"ranking_period={rp_value}&sport_code={sport_id}"
+        + f"&sport_code={sport_id}"
     )
 
-    response = _get_webpage(url=url)
-    # with open("test.html", "w+") as f:
-    #     f.write(response.text)
-    soup = BeautifulSoup(response.text, features="lxml")
-    soup = soup.find(
-        "table",
-        {"id": "rankings_table"},
-    )
-    soup = soup.find("tbody")
-    t_rows = soup.find_all("tr")
-
-    for t in t_rows:
-        team_id = t.find("a")
-        team_id = team_id.get("href")
-        team_id = team_id.replace("/teams/", "")
-        team_id = int(team_id)
-        team = t.find_all("td")[1].get("data-order")
-        team_name, team_conference_name = team.split(",")
-        del team
-        temp_df = pd.DataFrame(
-            {
-                "season": season,
-                "ncaa_division": ncaa_level,
-                "ncaa_division_formatted": formatted_level,
-                "team_conference_name": team_conference_name,
-                "team_id": team_id,
-                "school_name": team_name,
-                "sport_id": sport_id
-            },
-            index=[0],
+    best_method = True
+    if (
+        (season < 2015 and sport_id == "MBB")
+    ):
+        url = (
+            "https://stats.ncaa.org/rankings/national_ranking?"
+            + f"academic_year={season}.0&division={ncaa_level}.0&"
+            + f"ranking_period={rp_value}&sport_code={sport_id}"
+            + f"&stat_seq={stat_sequence}"
         )
-        teams_df_arr.append(temp_df)
-        del temp_df
+        response = _get_webpage(url=url)
+        best_method = False
+    elif season < 2013:
+        url = (
+            "https://stats.ncaa.org/rankings/national_ranking?"
+            + f"academic_year={season}.0&division={ncaa_level}.0&"
+            + f"ranking_period={rp_value}&sport_code={sport_id}"
+            + f"&stat_seq={stat_sequence}"
+        )
+        response = _get_webpage(url=url)
+        best_method = False
+    else:
+        try:
+            response = _get_webpage(url=url)
+        except Exception as e:
+            logging.info(f"Found exception when loading teams `{e}`")
+            logging.info("Attempting backup method.")
+            url = (
+                "https://stats.ncaa.org/rankings/national_ranking?"
+                + f"academic_year={season}.0&division={ncaa_level}.0&"
+                + f"ranking_period={rp_value}&sport_code={sport_id}"
+                + f"&stat_seq={stat_sequence}"
+            )
+            response = _get_webpage(url=url)
+            best_method = False
+
+    soup = BeautifulSoup(response.text, features="lxml")
+
+    if best_method is True:
+        soup = soup.find(
+            "table",
+            {"id": "stat_grid"},
+        )
+        soup = soup.find("tbody")
+        t_rows = soup.find_all("tr")
+
+        for t in t_rows:
+            team_id = t.find("a")
+            team_id = team_id.get("href")
+            team_id = team_id.replace("/teams/", "")
+            team_id = int(team_id)
+            team_name = t.find_all("td")[0].text
+            team_conference_name = t.find_all("td")[1].text
+            # del team
+            temp_df = pd.DataFrame(
+                {
+                    "season": season,
+                    "ncaa_division": ncaa_level,
+                    "ncaa_division_formatted": formatted_level,
+                    "team_conference_name": team_conference_name,
+                    "team_id": team_id,
+                    "school_name": team_name,
+                    "sport_id": sport_id,
+                },
+                index=[0],
+            )
+            teams_df_arr.append(temp_df)
+            del temp_df
+    else:
+        soup = soup.find(
+            "table",
+            {"id": "rankings_table"},
+        )
+        soup = soup.find("tbody")
+        t_rows = soup.find_all("tr")
+
+        for t in t_rows:
+            team_id = t.find("a")
+            team_id = team_id.get("href")
+            team_id = team_id.replace("/teams/", "")
+            team_id = int(team_id)
+            team = t.find_all("td")[1].get("data-order")
+            team_name, team_conference_name = team.split(",")
+            del team
+            temp_df = pd.DataFrame(
+                {
+                    "season": season,
+                    "ncaa_division": ncaa_level,
+                    "ncaa_division_formatted": formatted_level,
+                    "team_conference_name": team_conference_name,
+                    "team_id": team_id,
+                    "school_name": team_name,
+                    "sport_id": sport_id,
+                },
+                index=[0],
+            )
+            teams_df_arr.append(temp_df)
+            del temp_df
 
     teams_df = pd.concat(teams_df_arr, ignore_index=True)
     teams_df = pd.merge(
@@ -402,7 +465,10 @@ def load_basketball_teams(
 
     now = datetime.now()
     ncaa_divisions = ["I", "II", "III"]
-    ncaa_seasons = [x for x in range(start_year, (now.year + 1))]
+    if now.month > 5:
+        ncaa_seasons = [x for x in range(start_year, (now.year + 2))]
+    else:
+        ncaa_seasons = [x for x in range(start_year, (now.year + 1))]
 
     logging.info(
         "Loading in all NCAA basketball teams. "
@@ -587,8 +653,7 @@ def get_basketball_team_schedule(team_id: int) -> pd.DataFrame:
     age = now - file_mod_datetime
     if (
         age.days >= 1 and
-        season >= now.year and
-        now.month <= 7
+        season >= now.year
     ):
         load_from_cache = False
 
@@ -1109,8 +1174,7 @@ def get_full_basketball_schedule(
 
     if (
         age.days >= 1 and
-        season >= now.year and
-        now.month <= 7
+        season >= now.year
     ):
         load_from_cache = False
 
@@ -1297,8 +1361,7 @@ def get_basketball_team_roster(team_id: int) -> pd.DataFrame:
 
     if (
         age.days >= 14 and
-        season >= now.year and
-        now.month <= 7
+        season >= now.year
     ):
         load_from_cache = False
 
@@ -1632,8 +1695,7 @@ def get_basketball_player_season_stats(
 
     if (
         age.days >= 1 and
-        season >= now.year and
-        now.month <= 7
+        season >= now.year
     ):
         load_from_cache = False
 
@@ -2096,9 +2158,9 @@ def get_basketball_player_game_stats(
 
     for u in table_nav_card:
         url_str = u.get("href")
-        if "mbb" in url_str.lower():
+        if "MBB" in url_str.upper():
             sport_id = "MBB"
-        elif "wbb" in url_str.lower():
+        elif "WBB" in url_str.upper():
             sport_id = "WBB"
 
     if sport_id is None or len(sport_id) == 0:
@@ -3577,8 +3639,13 @@ def get_basketball_raw_pbp(game_id: int) -> pd.DataFrame:
 
             away_score = int(away_score)
             home_score = int(home_score)
-            temp_time_minutes, temp_time_seconds, game_time_ms = \
-                game_time_str.split(":")
+            if len(game_time_str.split(":")) == 3:
+                temp_time_minutes, temp_time_seconds, game_time_ms = \
+                    game_time_str.split(":")
+            elif len(game_time_str.split(":")) == 2:
+                temp_time_minutes, temp_time_seconds = \
+                    game_time_str.split(":")
+                game_time_ms = 0
 
             temp_time_minutes = int(temp_time_minutes)
             temp_time_seconds = int(temp_time_seconds)
