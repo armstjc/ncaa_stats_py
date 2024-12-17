@@ -1,5 +1,17 @@
 # `ncaa_stats_py` Changelog
 
+## 0.0.5: The "Softball" update
+- Implemented `ncaa_stats_py.softball.get_softball_teams()`, a function that allows you to get a list of NCAA softball teams for a season and level.
+- Implemented `ncaa_stats_py.softball.load_softball_teams()`, a function that builds on top of `ncaa_stats_py.softball.get_softball_teams()`, and retrieves a list of all possible softball teams from 2008 to present day.
+- Implemented `ncaa_stats_py.softball.get_softball_team_schedule()`, a function that allows you to get a schedule for a specific softball team.
+- Implemented `ncaa_stats_py.softball.get_full_softball_schedule()`, a function that builds on top of `ncaa_stats_py.softball.get_softball_team_schedule()` and allows you to get the entire softball schedule for a given season and level.
+- Implemented `ncaa_stats_py.softball.get_softball_player_season_batting_stats()`, `ncaa_stats_py.softball.get_softball_player_season_pitching_stats()`, and `ncaa_stats_py.softball.get_softball_player_season_fielding_stats()` to enable a user to get season player stats from an NCAA softball team.
+- Implemented `ncaa_stats_py.softball.get_softball_player_game_batting_stats()`, `ncaa_stats_py.softball.get_softball_player_game_pitching_stats()`, and `ncaa_stats_py.softball.get_softball_player_game_fielding_stats()` to enable a user to get game-level player stats from an NCAA softball team.
+- Implemented `ncaa_stats_py.softball.get_softball_game_player_stats()` and `ncaa_stats_py.softball.get_softball_game_team_stats()` to get stats from a specific game.
+- Implemented `ncaa_stats_py.softball.get_raw_softball_game_pbp()` to play-by-play, and normalize the data into something that can be parsed at a later date.
+- Fixed a bug with `ncaa_stats_py.baseball.get_raw_softball_game_pbp()` where data parsed by that function wouldn't get cached.
+- Set the package version to `0.0.5`.
+
 ## 0.0.4: The "Hockey" update
 - Implemented `ncaa_stats_py.hockey.get_hockey_teams()`, a function that allows one to get a list of all hockey teams given a season and a NCAA level.
 - Implemented `ncaa_stats_py.hockey.load_hockey_teams()`, a function that allows one to load in every hockey team from a starting year (default is 2009) to present day.
@@ -18,7 +30,7 @@
     - `ncaa_stats_py.baseball.get_baseball_teams()`
     - `ncaa_stats_py.basketball.get_basketball_teams()`
     - `ncaa_stats_py.field_hockey.get_field_hockey_teams()`
-- Set the package version to `0.0.3`.
+- Set the package version to `0.0.4`.
 
 
 ## 0.0.3: The "Field Hockey" update

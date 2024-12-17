@@ -8,6 +8,7 @@
 # - 2024-09-23 10:30 PM EDT
 # - 2024-11-01 12:10 AM EDT
 # - 2024-11-25 07:45 PM EDT
+# - 2024-12-17 10:30 AM EDT
 
 
 import logging
@@ -3881,7 +3882,7 @@ def get_raw_baseball_game_pbp(game_id: int):
     this function will attempt to get the raw play-by-play (PBP)
     data for that game.
 
-    Long term goal is to get this, but for college baseball:
+    Long term goal is to get to something like this, but for college baseball:
     https://www.retrosheet.org/datause.html
 
     Parameters
@@ -4140,5 +4141,9 @@ def get_raw_baseball_game_pbp(game_id: int):
     pbp_df["sport_id"] = sport_id
 
     pbp_df = pbp_df.infer_objects()
-
+    pbp_df.to_csv(
+        f"{home_dir}/.ncaa_stats_py/baseball/raw_pbp/"
+        + f"{game_id}_raw_pbp.csv",
+        index=False
+    )
     return pbp_df
