@@ -1448,6 +1448,8 @@
                         <li><a href="#how-to-use">How to Use</a></li>
                     </ul>
                 </li>
+                <li><a href="#dependencies">Dependencies</a></li>
+                <li><a href="#license">License</a></li>
             </ul>
 
 
@@ -1536,7 +1538,8 @@
                         won't result in you getting IP banned
                         (you do not <em>need</em> to add sleep timers if you're looping through,
                         and calling functions in this python package).</li>
-                    <li>Automatically refreshing any cached data if it's stale.</li>
+                    <li>Automatically refreshing any cached data if the data
+                        hasn't been refreshed in a while.</li>
                 </ol>
 
                 <p>For example, the following code will work as-is,
@@ -1549,16 +1552,16 @@
 
 <span class="kn">from</span> <span class="nn"><a href="ncaa_stats_py/baseball.html">ncaa_stats_py.baseball</a></span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_baseball_team_roster</span><span class="p">,</span>
-    <span class="n">load_baseball_teams</span>
+    <span class="n">get_baseball_teams</span>
 <span class="p">)</span>
 
 <span class="n">start_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
 
-<span class="c1"># Loads in a table with every NCAA baseball team from 2008 to present day.</span>
+<span class="c1"># Loads in a table with every DI NCAA baseball team in the 2024 season.</span>
 <span class="c1"># If this is the first time you run this script,</span>
 <span class="c1"># it may take some time to repopulate the NCAA baseball team information data.</span>
 
-<span class="n">teams_df</span> <span class="o">=</span> <span class="n">load_baseball_teams</span><span class="p">()</span>
+<span class="n">teams_df</span> <span class="o">=</span> <span class="n">get_baseball_teams</span><span class="p">(</span><span class="n">season</span><span class="o">=</span><span class="mi">2024</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;I&quot;</span><span class="p">)</span>
 
 <span class="n">end_time</span> <span class="o">=</span> <span class="n">timer</span><span class="p">()</span>
 
@@ -1567,11 +1570,10 @@
 
 <span class="s2">&quot;)</span>
 
-<span class="c1"># Gets 5 random D1 teams from 2023</span>
+<span class="c1"># Gets 5 random D1 teams from 2024</span>
 <span class="n">teams_df</span> <span class="o">=</span> <span class="n">teams_df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">teams_df</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">()</span>
-
 
 <span class="c1"># Let&#39;s send this to a list to make the loop slightly faster</span>
 <span class="n">team_ids_list</span> <span class="o">=</span> <span class="n">teams_df</span><span class="p">[</span><span class="s2">&quot;team_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
@@ -1609,6 +1611,34 @@
 <span class="s2">&quot;)</span>
 </code></pre>
                 </div>
+
+                <h1 id="dependencies">Dependencies</h1>
+
+                <p><code><a href="">ncaa_stats_py</a></code> is dependent on the following python packages:</p>
+
+                <ul>
+                    <li><a href="https://www.crummy.com/software/BeautifulSoup/"><code>beautifulsoup4</code></a>:
+                        To assist with parsing HTML data.</li>
+                    <li><a href="https://lxml.de/"><code>lxml</code></a>: To work with <code>beautifulsoup4</code>
+                        in assisting with parsing HTML data.</li>
+                    <li><a href="https://github.com/pandas-dev/pandas"><code>pandas</code></a>:
+                        For <code>DataFrame</code> creation within package functions.</li>
+                    <li><a href="https://pythonhosted.org/pytz/"><code>pytz</code></a>:
+                        Used to attach timezone information for any date/date time objects
+                        encountered by this package.</li>
+                    <li><a href="https://github.com/psf/requests"><code>requests</code></a>: Used to make HTTPS
+                        requests.</li>
+                    <li><a href="https://github.com/tqdm/tqdm"><code>tqdm</code></a>:
+                        Used to show progress bars for actions in functions
+                        that are known to take minutes to load.</li>
+                </ul>
+
+                <h1 id="license">License</h1>
+
+                <p>This package is licensed under the MIT license.
+                    You can view the package's license
+                    <a href="https://github.com/armstjc/ncaa_stats_py/blob/main/LICENSE">here</a>.
+                </p>
             </div>
 
             <input id="mod-ncaa_stats_py-view-source" class="view-source-toggle-state" type="checkbox"
@@ -1666,39 +1696,39 @@
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">    won&#39;t result in you getting IP banned</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">    (you do not *need* to add sleep timers if you&#39;re looping through,</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="sd">    and calling functions in this python package).</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">3. Automatically refreshing any cached data if it&#39;s stale.</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="sd">For example, the following code will work as-is,</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="sd">    and in the second loop, the code will load in the teams</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="sd">    even faster because the data is cached</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="sd">    on the device you&#39;re running this code.</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">```python</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">from timeit import default_timer as timer</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">from ncaa_stats_py.baseball import (</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">    get_baseball_team_roster,</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">    load_baseball_teams</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">)</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">start_time = timer()</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd"># Loads in a table with every NCAA baseball team from 2008 to present day.</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd"># If this is the first time you run this script,</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd"># it may take some time to repopulate the NCAA baseball team information data.</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">teams_df = load_baseball_teams()</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">end_time = timer()</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">time_elapsed = end_time - start_time</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">print(f&quot;Elapsed time: {time_elapsed:03f} seconds.\n\n&quot;)</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="sd"># Gets 5 random D1 teams from 2023</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">teams_df = teams_df.sample(5)</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">print(teams_df)</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">print()</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">3. Automatically refreshing any cached data if the data</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="sd">    hasn&#39;t been refreshed in a while.</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="sd">For example, the following code will work as-is,</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="sd">    and in the second loop, the code will load in the teams</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="sd">    even faster because the data is cached</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">    on the device you&#39;re running this code.</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">```python</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">from timeit import default_timer as timer</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">from ncaa_stats_py.baseball import (</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">    get_baseball_team_roster,</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">    get_baseball_teams</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">)</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">start_time = timer()</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd"># Loads in a table with every DI NCAA baseball team in the 2024 season.</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd"># If this is the first time you run this script,</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd"># it may take some time to repopulate the NCAA baseball team information data.</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">teams_df = get_baseball_teams(season=2024, level=&quot;I&quot;)</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">end_time = timer()</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">time_elapsed = end_time - start_time</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">print(f&quot;Elapsed time: {time_elapsed:03f} seconds.\n\n&quot;)</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd"># Gets 5 random D1 teams from 2024</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">teams_df = teams_df.sample(5)</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">print(teams_df)</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">print()</span>
 </span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>
 </span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd"># Let&#39;s send this to a list to make the loop slightly faster</span>
 </span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">team_ids_list = teams_df[&quot;team_id&quot;].to_list()</span>
@@ -1733,12 +1763,35 @@
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>
 </span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">```</span>
 </span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="kn">from</span> <span class="nn">ncaa_stats_py.baseball</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># noqa: F403</span>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="kn">from</span> <span class="nn">ncaa_stats_py.basketball</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># noqa: F403</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="kn">from</span> <span class="nn">ncaa_stats_py.field_hockey</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># noqa: F403</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd"># Dependencies</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">`ncaa_stats_py` is dependent on the following python packages:</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="sd">- [`beautifulsoup4`](https://www.crummy.com/software/BeautifulSoup/):</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">    To assist with parsing HTML data.</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="sd">- [`lxml`](https://lxml.de/): To work with `beautifulsoup4`</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">    in assisting with parsing HTML data.</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="sd">- [`pandas`](https://github.com/pandas-dev/pandas):</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">    For `DataFrame` creation within package functions.</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">- [`pytz`](https://pythonhosted.org/pytz/):</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="sd">    Used to attach timezone information for any date/date time objects</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">    encountered by this package.</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="sd">- [`requests`](https://github.com/psf/requests): Used to make HTTPS requests.</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="sd">- [`tqdm`](https://github.com/tqdm/tqdm):</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a><span class="sd">    Used to show progress bars for actions in functions</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="sd">    that are known to take minutes to load.</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="sd"># License</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a><span class="sd">This package is licensed under the MIT license.</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a><span class="sd">You can view the package&#39;s license</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a><span class="sd">[here](https://github.com/armstjc/ncaa_stats_py/blob/main/LICENSE).</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="kn">from</span> <span class="nn">ncaa_stats_py.baseball</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># noqa: F403</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a><span class="kn">from</span> <span class="nn">ncaa_stats_py.basketball</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># noqa: F403</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a><span class="kn">from</span> <span class="nn">ncaa_stats_py.field_hockey</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># noqa: F403</span>
 </span></pre>
             </div>
 

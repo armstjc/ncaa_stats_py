@@ -9,6 +9,7 @@
 # - 2024-09-23 10:30 PM EDT
 # - 2024-11-01 12:10 AM EDT
 # - 2024-11-25 07:45 PM EDT
+# - 2024-12-17 10:30 AM EDT
 
 
 import logging
@@ -362,6 +363,93 @@ def _stat_id_dict() -> dict:
                 "non_goalkeepers": 15596
             },
         },
+        "softball": {
+            2025: {
+                "season": 2025,
+                "batting": 15667,
+                "pitching": 15668,
+                "fielding": 15669,
+            },
+            2024: {
+                "season": 2024,
+                "batting": 15060,
+                "pitching": 15061,
+                "fielding": 15062,
+            },
+            2023: {
+                "season": 2023,
+                "batting": 15020,
+                "pitching": 15021,
+                "fielding": 15022,
+            },
+            2022: {
+                "season": 2022,
+                "batting": 14960,
+                "pitching": 14961,
+                "fielding": 14962,
+            },
+            2021: {
+                "season": 2021,
+                "batting": 14860,
+                "pitching": 14861,
+                "fielding": 14862,
+            },
+            2020: {
+                "season": 2020,
+                "batting": 14780,
+                "pitching": 14781,
+                "fielding": 14782,
+            },
+            2019: {
+                "season": 2019,
+                "batting": 14660,
+                "pitching": 14661,
+                "fielding": 14662,
+            },
+            2018: {
+                "season": 2018,
+                "batting": 13300,
+                "pitching": 13301,
+                "fielding": 13302,
+            },
+            2017: {
+                "season": 2017,
+                "batting": 11020,
+                "pitching": 11021,
+                "fielding": 11022,
+            },
+            2016: {
+                "season": 2016,
+                "batting": 10840,
+                "pitching": 10841,
+                "fielding": 10842,
+            },
+            2015: {
+                "season": 2015,
+                "batting": 10800,
+                "pitching": 10801,
+                "fielding": 10802,
+            },
+            2014: {
+                "season": 2014,
+                "batting": 10480,
+                "pitching": 10481,
+                "fielding": 10482,
+            },
+            2013: {
+                "season": 2013,
+                "batting": 10100,
+                "pitching": 10101,
+                "fielding": 10102,
+            },
+            2012: {
+                "season": 2012,
+                "batting": 1,
+                "pitching": 2,
+                "fielding": 3,
+            },
+
+        }
     }
     return stat_id_dict
 

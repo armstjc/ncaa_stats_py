@@ -5409,7 +5409,7 @@
 </span><span id="L-3881"><a href="#L-3881"><span class="linenos">3881</span></a><span class="sd">    this function will attempt to get the raw play-by-play (PBP)</span>
 </span><span id="L-3882"><a href="#L-3882"><span class="linenos">3882</span></a><span class="sd">    data for that game.</span>
 </span><span id="L-3883"><a href="#L-3883"><span class="linenos">3883</span></a>
-</span><span id="L-3884"><a href="#L-3884"><span class="linenos">3884</span></a><span class="sd">    Long term goal is to get this, but for college baseball:</span>
+</span><span id="L-3884"><a href="#L-3884"><span class="linenos">3884</span></a><span class="sd">    Long term goal is to get to something like this, but for college baseball:</span>
 </span><span id="L-3885"><a href="#L-3885"><span class="linenos">3885</span></a><span class="sd">    https://www.retrosheet.org/datause.html</span>
 </span><span id="L-3886"><a href="#L-3886"><span class="linenos">3886</span></a>
 </span><span id="L-3887"><a href="#L-3887"><span class="linenos">3887</span></a><span class="sd">    Parameters</span>
@@ -5668,8 +5668,12 @@
 </span><span id="L-4140"><a href="#L-4140"><span class="linenos">4140</span></a>    <span class="n">pbp_df</span><span class="p">[</span><span class="s2">&quot;sport_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sport_id</span>
 </span><span id="L-4141"><a href="#L-4141"><span class="linenos">4141</span></a>
 </span><span id="L-4142"><a href="#L-4142"><span class="linenos">4142</span></a>    <span class="n">pbp_df</span> <span class="o">=</span> <span class="n">pbp_df</span><span class="o">.</span><span class="n">infer_objects</span><span class="p">()</span>
-</span><span id="L-4143"><a href="#L-4143"><span class="linenos">4143</span></a>
-</span><span id="L-4144"><a href="#L-4144"><span class="linenos">4144</span></a>    <span class="k">return</span> <span class="n">pbp_df</span>
+</span><span id="L-4143"><a href="#L-4143"><span class="linenos">4143</span></a>    <span class="n">pbp_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+</span><span id="L-4144"><a href="#L-4144"><span class="linenos">4144</span></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">home_dir</span><span class="si">}</span><span class="s2">/.ncaa_stats_py/baseball/raw_pbp/&quot;</span>
+</span><span id="L-4145"><a href="#L-4145"><span class="linenos">4145</span></a>        <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">game_id</span><span class="si">}</span><span class="s2">_raw_pbp.csv&quot;</span><span class="p">,</span>
+</span><span id="L-4146"><a href="#L-4146"><span class="linenos">4146</span></a>        <span class="n">index</span><span class="o">=</span><span class="kc">False</span>
+</span><span id="L-4147"><a href="#L-4147"><span class="linenos">4147</span></a>    <span class="p">)</span>
+</span><span id="L-4148"><a href="#L-4148"><span class="linenos">4148</span></a>    <span class="k">return</span> <span class="n">pbp_df</span>
 </span></pre>
             </div>
 
@@ -10584,7 +10588,7 @@
 </span><span id="get_raw_baseball_game_pbp-3882"><a href="#get_raw_baseball_game_pbp-3882"><span class="linenos">3882</span></a><span class="sd">    this function will attempt to get the raw play-by-play (PBP)</span>
 </span><span id="get_raw_baseball_game_pbp-3883"><a href="#get_raw_baseball_game_pbp-3883"><span class="linenos">3883</span></a><span class="sd">    data for that game.</span>
 </span><span id="get_raw_baseball_game_pbp-3884"><a href="#get_raw_baseball_game_pbp-3884"><span class="linenos">3884</span></a>
-</span><span id="get_raw_baseball_game_pbp-3885"><a href="#get_raw_baseball_game_pbp-3885"><span class="linenos">3885</span></a><span class="sd">    Long term goal is to get this, but for college baseball:</span>
+</span><span id="get_raw_baseball_game_pbp-3885"><a href="#get_raw_baseball_game_pbp-3885"><span class="linenos">3885</span></a><span class="sd">    Long term goal is to get to something like this, but for college baseball:</span>
 </span><span id="get_raw_baseball_game_pbp-3886"><a href="#get_raw_baseball_game_pbp-3886"><span class="linenos">3886</span></a><span class="sd">    https://www.retrosheet.org/datause.html</span>
 </span><span id="get_raw_baseball_game_pbp-3887"><a href="#get_raw_baseball_game_pbp-3887"><span class="linenos">3887</span></a>
 </span><span id="get_raw_baseball_game_pbp-3888"><a href="#get_raw_baseball_game_pbp-3888"><span class="linenos">3888</span></a><span class="sd">    Parameters</span>
@@ -10843,8 +10847,12 @@
 </span><span id="get_raw_baseball_game_pbp-4141"><a href="#get_raw_baseball_game_pbp-4141"><span class="linenos">4141</span></a>    <span class="n">pbp_df</span><span class="p">[</span><span class="s2">&quot;sport_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sport_id</span>
 </span><span id="get_raw_baseball_game_pbp-4142"><a href="#get_raw_baseball_game_pbp-4142"><span class="linenos">4142</span></a>
 </span><span id="get_raw_baseball_game_pbp-4143"><a href="#get_raw_baseball_game_pbp-4143"><span class="linenos">4143</span></a>    <span class="n">pbp_df</span> <span class="o">=</span> <span class="n">pbp_df</span><span class="o">.</span><span class="n">infer_objects</span><span class="p">()</span>
-</span><span id="get_raw_baseball_game_pbp-4144"><a href="#get_raw_baseball_game_pbp-4144"><span class="linenos">4144</span></a>
-</span><span id="get_raw_baseball_game_pbp-4145"><a href="#get_raw_baseball_game_pbp-4145"><span class="linenos">4145</span></a>    <span class="k">return</span> <span class="n">pbp_df</span>
+</span><span id="get_raw_baseball_game_pbp-4144"><a href="#get_raw_baseball_game_pbp-4144"><span class="linenos">4144</span></a>    <span class="n">pbp_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+</span><span id="get_raw_baseball_game_pbp-4145"><a href="#get_raw_baseball_game_pbp-4145"><span class="linenos">4145</span></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">home_dir</span><span class="si">}</span><span class="s2">/.ncaa_stats_py/baseball/raw_pbp/&quot;</span>
+</span><span id="get_raw_baseball_game_pbp-4146"><a href="#get_raw_baseball_game_pbp-4146"><span class="linenos">4146</span></a>        <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">game_id</span><span class="si">}</span><span class="s2">_raw_pbp.csv&quot;</span><span class="p">,</span>
+</span><span id="get_raw_baseball_game_pbp-4147"><a href="#get_raw_baseball_game_pbp-4147"><span class="linenos">4147</span></a>        <span class="n">index</span><span class="o">=</span><span class="kc">False</span>
+</span><span id="get_raw_baseball_game_pbp-4148"><a href="#get_raw_baseball_game_pbp-4148"><span class="linenos">4148</span></a>    <span class="p">)</span>
+</span><span id="get_raw_baseball_game_pbp-4149"><a href="#get_raw_baseball_game_pbp-4149"><span class="linenos">4149</span></a>    <span class="k">return</span> <span class="n">pbp_df</span>
 </span></pre>
             </div>
 
@@ -10854,7 +10862,7 @@
                     this function will attempt to get the raw play-by-play (PBP)
                     data for that game.</p>
 
-                <p>Long term goal is to get this, but for college baseball:
+                <p>Long term goal is to get to something like this, but for college baseball:
                     <a href="https://www.retrosheet.org/datause.html">https://www.retrosheet.org/datause.html</a>
                 </p>
 
