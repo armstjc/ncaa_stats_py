@@ -10,6 +10,7 @@
 # - 2024-11-01 12:10 AM EDT
 # - 2024-11-25 07:45 PM EDT
 # - 2024-12-17 10:30 AM EDT
+# - 2025-01-04 03:00 PM EDT
 
 
 import logging
@@ -448,8 +449,161 @@ def _stat_id_dict() -> dict:
                 "pitching": 2,
                 "fielding": 3,
             },
-
-        }
+        },
+        "mens_lacrosse": {  # MLA
+            2025: {
+                "season": 2025,
+                "goalkeepers": 15650,
+                "non_goalkeepers": 15649
+            },
+            2024: {
+                "season": 2024,
+                "goalkeepers": 15167,
+                "non_goalkeepers": 15166
+            },
+            2023: {
+                "season": 2023,
+                "goalkeepers": 15507,
+                "non_goalkeepers": 15506
+            },
+            2022: {
+                "season": 2022,
+                "goalkeepers": 15509,
+                "non_goalkeepers": 15508
+            },
+            2021: {
+                "season": 2021,
+                "goalkeepers": 15511,
+                "non_goalkeepers": 15510
+            },
+            2020: {
+                "season": 2020,
+                "goalkeepers": 15513,
+                "non_goalkeepers": 15512
+            },
+            2019: {
+                "season": 2019,
+                "goalkeepers": 15515,
+                "non_goalkeepers": 15514
+            },
+            2018: {
+                "season": 2018,
+                "goalkeepers": 15517,
+                "non_goalkeepers": 15516
+            },
+            2017: {
+                "season": 2017,
+                "goalkeepers": 15519,
+                "non_goalkeepers": 15518
+            },
+            2016: {
+                "season": 2016,
+                "goalkeepers": 15521,
+                "non_goalkeepers": 15520
+            },
+            2015: {
+                "season": 2015,
+                "goalkeepers": 15523,
+                "non_goalkeepers": 15522
+            },
+            2014: {
+                "season": 2014,
+                "goalkeepers": 15525,
+                "non_goalkeepers": 15524
+            },
+            2013: {
+                "season": 2013,
+                "goalkeepers": 15527,
+                "non_goalkeepers": 15526
+            },
+            2012: {
+                "season": 2012,
+                "goalkeepers": 15529,
+                "non_goalkeepers": 15528
+            },
+            2011: {
+                "season": 2011,
+                "goalkeepers": 15531,
+                "non_goalkeepers": 15530
+            },
+        },
+        "womens_lacrosse": {  # WLA
+            2024: {
+                "season": 2024,
+                "goalkeepers": 15155,
+                "non_goalkeepers": 15154
+            },
+            2023: {
+                "season": 2023,
+                "goalkeepers": 15537,
+                "non_goalkeepers": 15536
+            },
+            2022: {
+                "season": 2022,
+                "goalkeepers": 15539,
+                "non_goalkeepers": 15538
+            },
+            2021: {
+                "season": 2021,
+                "goalkeepers": 15541,
+                "non_goalkeepers": 15540
+            },
+            2020: {
+                "season": 2020,
+                "goalkeepers": 15543,
+                "non_goalkeepers": 15542
+            },
+            2019: {
+                "season": 2019,
+                "goalkeepers": 15545,
+                "non_goalkeepers": 15544
+            },
+            2018: {
+                "season": 2018,
+                "goalkeepers": 15547,
+                "non_goalkeepers": 15546
+            },
+            2017: {
+                "season": 2017,
+                "goalkeepers": 15549,
+                "non_goalkeepers": 15548
+            },
+            2016: {
+                "season": 2016,
+                "goalkeepers": 15551,
+                "non_goalkeepers": 15550
+            },
+            2015: {
+                "season": 2015,
+                "goalkeepers": 15553,
+                "non_goalkeepers": 15552
+            },
+            2014: {
+                "season": 2014,
+                "goalkeepers": 15555,
+                "non_goalkeepers": 15554
+            },
+            2013: {
+                "season": 2013,
+                "goalkeepers": 15557,
+                "non_goalkeepers": 15556
+            },
+            2012: {
+                "season": 2012,
+                "goalkeepers": 15559,
+                "non_goalkeepers": 15558
+            },
+            2011: {
+                "season": 2011,
+                "goalkeepers": 15561,
+                "non_goalkeepers": 15560
+            },
+            2010: {
+                "season": 2010,
+                "goalkeepers": 15563,
+                "non_goalkeepers": 15562
+            },
+        },
     }
     return stat_id_dict
 

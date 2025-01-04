@@ -2187,7 +2187,7 @@
 </span><span id="L-680"><a href="#L-680"><span class="linenos"> 680</span></a>        <span class="c1"># this means that this game is an extra innings game.</span>
 </span><span id="L-681"><a href="#L-681"><span class="linenos"> 681</span></a>        <span class="c1"># The number encased in `()` is the actual number of innings.</span>
 </span><span id="L-682"><a href="#L-682"><span class="linenos"> 682</span></a>        <span class="c1"># We need to remove that from the date,</span>
-</span><span id="L-683"><a href="#L-683"><span class="linenos"> 683</span></a>        <span class="c1"># # and move it into a separate variable.</span>
+</span><span id="L-683"><a href="#L-683"><span class="linenos"> 683</span></a>        <span class="c1"># and move it into a separate variable.</span>
 </span><span id="L-684"><a href="#L-684"><span class="linenos"> 684</span></a>        <span class="k">if</span> <span class="s2">&quot;(&quot;</span> <span class="ow">in</span> <span class="n">game_date</span><span class="p">:</span>
 </span><span id="L-685"><a href="#L-685"><span class="linenos"> 685</span></a>            <span class="n">game_date</span> <span class="o">=</span> <span class="n">game_date</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 </span><span id="L-686"><a href="#L-686"><span class="linenos"> 686</span></a>            <span class="n">game_date</span><span class="p">,</span> <span class="n">game_num</span> <span class="o">=</span> <span class="n">game_date</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)</span>
@@ -2730,9 +2730,9 @@
 </span><span id="L-1223"><a href="#L-1223"><span class="linenos">1223</span></a><span class="sd">    df = get_hockey_team_roster(511550)</span>
 </span><span id="L-1224"><a href="#L-1224"><span class="linenos">1224</span></a><span class="sd">    print(df)</span>
 </span><span id="L-1225"><a href="#L-1225"><span class="linenos">1225</span></a>
-</span><span id="L-1226"><a href="#L-1226"><span class="linenos">1226</span></a><span class="sd">    # ########################################</span>
-</span><span id="L-1227"><a href="#L-1227"><span class="linenos">1227</span></a><span class="sd">    # #          Women&#39;s hockey              #</span>
-</span><span id="L-1228"><a href="#L-1228"><span class="linenos">1228</span></a><span class="sd">    # ########################################</span>
+</span><span id="L-1226"><a href="#L-1226"><span class="linenos">1226</span></a><span class="sd">    ########################################</span>
+</span><span id="L-1227"><a href="#L-1227"><span class="linenos">1227</span></a><span class="sd">    #          Women&#39;s hockey              #</span>
+</span><span id="L-1228"><a href="#L-1228"><span class="linenos">1228</span></a><span class="sd">    ########################################</span>
 </span><span id="L-1229"><a href="#L-1229"><span class="linenos">1229</span></a>
 </span><span id="L-1230"><a href="#L-1230"><span class="linenos">1230</span></a><span class="sd">    # Get the hockey roster for the</span>
 </span><span id="L-1231"><a href="#L-1231"><span class="linenos">1231</span></a><span class="sd">    # 2024 New Hampshire MIH team (D1, ID: 562857).</span>
@@ -2875,7 +2875,7 @@
 </span><span id="L-1368"><a href="#L-1368"><span class="linenos">1368</span></a>    <span class="c1"># and ends in the fall semester.</span>
 </span><span id="L-1369"><a href="#L-1369"><span class="linenos">1369</span></a>    <span class="c1"># Thus, if `season_name` = &quot;2011-12&quot;, this is the &quot;2012&quot; hockey season,</span>
 </span><span id="L-1370"><a href="#L-1370"><span class="linenos">1370</span></a>    <span class="c1"># because 2012 would encompass the spring and fall semesters</span>
-</span><span id="L-1371"><a href="#L-1371"><span class="linenos">1371</span></a>    <span class="c1"># # for NCAA member institutions.</span>
+</span><span id="L-1371"><a href="#L-1371"><span class="linenos">1371</span></a>    <span class="c1"># for NCAA member institutions.</span>
 </span><span id="L-1372"><a href="#L-1372"><span class="linenos">1372</span></a>    <span class="n">season</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">season_name</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="si">}{</span><span class="n">season_name</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span>
 </span><span id="L-1373"><a href="#L-1373"><span class="linenos">1373</span></a>    <span class="n">season</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">season</span><span class="p">)</span>
 </span><span id="L-1374"><a href="#L-1374"><span class="linenos">1374</span></a>
@@ -6174,7 +6174,7 @@ a "DII" level of hockey.
 </span><span id="get_hockey_team_schedule-681"><a href="#get_hockey_team_schedule-681"><span class="linenos">681</span></a>        <span class="c1"># this means that this game is an extra innings game.</span>
 </span><span id="get_hockey_team_schedule-682"><a href="#get_hockey_team_schedule-682"><span class="linenos">682</span></a>        <span class="c1"># The number encased in `()` is the actual number of innings.</span>
 </span><span id="get_hockey_team_schedule-683"><a href="#get_hockey_team_schedule-683"><span class="linenos">683</span></a>        <span class="c1"># We need to remove that from the date,</span>
-</span><span id="get_hockey_team_schedule-684"><a href="#get_hockey_team_schedule-684"><span class="linenos">684</span></a>        <span class="c1"># # and move it into a separate variable.</span>
+</span><span id="get_hockey_team_schedule-684"><a href="#get_hockey_team_schedule-684"><span class="linenos">684</span></a>        <span class="c1"># and move it into a separate variable.</span>
 </span><span id="get_hockey_team_schedule-685"><a href="#get_hockey_team_schedule-685"><span class="linenos">685</span></a>        <span class="k">if</span> <span class="s2">&quot;(&quot;</span> <span class="ow">in</span> <span class="n">game_date</span><span class="p">:</span>
 </span><span id="get_hockey_team_schedule-686"><a href="#get_hockey_team_schedule-686"><span class="linenos">686</span></a>            <span class="n">game_date</span> <span class="o">=</span> <span class="n">game_date</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 </span><span id="get_hockey_team_schedule-687"><a href="#get_hockey_team_schedule-687"><span class="linenos">687</span></a>            <span class="n">game_date</span><span class="p">,</span> <span class="n">game_num</span> <span class="o">=</span> <span class="n">game_date</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)</span>
@@ -6930,9 +6930,9 @@ a "DII" level of hockey.
 </span><span id="get_hockey_team_roster-1224"><a href="#get_hockey_team_roster-1224"><span class="linenos">1224</span></a><span class="sd">    df = get_hockey_team_roster(511550)</span>
 </span><span id="get_hockey_team_roster-1225"><a href="#get_hockey_team_roster-1225"><span class="linenos">1225</span></a><span class="sd">    print(df)</span>
 </span><span id="get_hockey_team_roster-1226"><a href="#get_hockey_team_roster-1226"><span class="linenos">1226</span></a>
-</span><span id="get_hockey_team_roster-1227"><a href="#get_hockey_team_roster-1227"><span class="linenos">1227</span></a><span class="sd">    # ########################################</span>
-</span><span id="get_hockey_team_roster-1228"><a href="#get_hockey_team_roster-1228"><span class="linenos">1228</span></a><span class="sd">    # #          Women&#39;s hockey              #</span>
-</span><span id="get_hockey_team_roster-1229"><a href="#get_hockey_team_roster-1229"><span class="linenos">1229</span></a><span class="sd">    # ########################################</span>
+</span><span id="get_hockey_team_roster-1227"><a href="#get_hockey_team_roster-1227"><span class="linenos">1227</span></a><span class="sd">    ########################################</span>
+</span><span id="get_hockey_team_roster-1228"><a href="#get_hockey_team_roster-1228"><span class="linenos">1228</span></a><span class="sd">    #          Women&#39;s hockey              #</span>
+</span><span id="get_hockey_team_roster-1229"><a href="#get_hockey_team_roster-1229"><span class="linenos">1229</span></a><span class="sd">    ########################################</span>
 </span><span id="get_hockey_team_roster-1230"><a href="#get_hockey_team_roster-1230"><span class="linenos">1230</span></a>
 </span><span id="get_hockey_team_roster-1231"><a href="#get_hockey_team_roster-1231"><span class="linenos">1231</span></a><span class="sd">    # Get the hockey roster for the</span>
 </span><span id="get_hockey_team_roster-1232"><a href="#get_hockey_team_roster-1232"><span class="linenos">1232</span></a><span class="sd">    # 2024 New Hampshire MIH team (D1, ID: 562857).</span>
@@ -7075,7 +7075,7 @@ a "DII" level of hockey.
 </span><span id="get_hockey_team_roster-1369"><a href="#get_hockey_team_roster-1369"><span class="linenos">1369</span></a>    <span class="c1"># and ends in the fall semester.</span>
 </span><span id="get_hockey_team_roster-1370"><a href="#get_hockey_team_roster-1370"><span class="linenos">1370</span></a>    <span class="c1"># Thus, if `season_name` = &quot;2011-12&quot;, this is the &quot;2012&quot; hockey season,</span>
 </span><span id="get_hockey_team_roster-1371"><a href="#get_hockey_team_roster-1371"><span class="linenos">1371</span></a>    <span class="c1"># because 2012 would encompass the spring and fall semesters</span>
-</span><span id="get_hockey_team_roster-1372"><a href="#get_hockey_team_roster-1372"><span class="linenos">1372</span></a>    <span class="c1"># # for NCAA member institutions.</span>
+</span><span id="get_hockey_team_roster-1372"><a href="#get_hockey_team_roster-1372"><span class="linenos">1372</span></a>    <span class="c1"># for NCAA member institutions.</span>
 </span><span id="get_hockey_team_roster-1373"><a href="#get_hockey_team_roster-1373"><span class="linenos">1373</span></a>    <span class="n">season</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">season_name</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="si">}{</span><span class="n">season_name</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span>
 </span><span id="get_hockey_team_roster-1374"><a href="#get_hockey_team_roster-1374"><span class="linenos">1374</span></a>    <span class="n">season</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">season</span><span class="p">)</span>
 </span><span id="get_hockey_team_roster-1375"><a href="#get_hockey_team_roster-1375"><span class="linenos">1375</span></a>
@@ -7196,9 +7196,9 @@ a "DII" level of hockey.
 <span class="n">df</span> <span class="o">=</span> <span class="n">get_hockey_team_roster</span><span class="p">(</span><span class="mi">511550</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
-<span class="c1"># ########################################</span>
-<span class="c1"># #          Women&#39;s hockey              #</span>
-<span class="c1"># ########################################</span>
+<span class="c1">########################################</span>
+<span class="c1">#          Women&#39;s hockey              #</span>
+<span class="c1">########################################</span>
 
 <span class="c1"># Get the hockey roster for the</span>
 <span class="c1"># 2024 New Hampshire MIH team (D1, ID: 562857).</span>

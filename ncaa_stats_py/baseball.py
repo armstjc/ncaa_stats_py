@@ -9,6 +9,7 @@
 # - 2024-11-01 12:10 AM EDT
 # - 2024-11-25 07:45 PM EDT
 # - 2024-12-17 10:30 AM EDT
+# - 2025-01-04 03:00 PM EDT
 
 
 import logging
@@ -514,7 +515,7 @@ def get_baseball_team_schedule(team_id: int) -> pd.DataFrame:
     # and ends in the fall semester.
     # Thus, if `season_name` = "2011-12", this is the "2012" baseball season,
     # because 2012 would encompass the spring and fall semesters
-    # # for NCAA member institutions.
+    # for NCAA member institutions.
     # season = f"{season_name[0:2]}{season_name[-2:]}"
     # season = int(season)
     soup = soup.find_all(
@@ -566,7 +567,7 @@ def get_baseball_team_schedule(team_id: int) -> pd.DataFrame:
         # this means that this game is an extra innings game.
         # The number encased in `()` is the actual number of innings.
         # We need to remove that from the date,
-        # # and move it into a separate variable.
+        # and move it into a separate variable.
         if "(" in game_date:
             game_date = game_date.replace(")", "")
             game_date, game_num = game_date.split("(")
@@ -1162,7 +1163,7 @@ def get_baseball_team_roster(team_id: int) -> pd.DataFrame:
     # and ends in the fall semester.
     # Thus, if `season_name` = "2011-12", this is the "2012" baseball season,
     # because 2012 would encompass the spring and fall semesters
-    # # for NCAA member institutions.
+    # for NCAA member institutions.
     season = f"{season_name[0:2]}{season_name[-2:]}"
     season = int(season)
 
@@ -1388,7 +1389,7 @@ def get_baseball_player_season_batting_stats(
     # and ends in the fall semester.
     # Thus, if `season_name` = "2011-12", this is the "2012" baseball season,
     # because 2012 would encompass the spring and fall semesters
-    # # for NCAA member institutions.
+    # for NCAA member institutions.
     season = f"{season_name[0:2]}{season_name[-2:]}"
     season = int(season)
 
@@ -1673,7 +1674,7 @@ def get_baseball_player_season_pitching_stats(
     # and ends in the fall semester.
     # Thus, if `season_name` = "2011-12", this is the "2012" baseball season,
     # because 2012 would encompass the spring and fall semesters
-    # # for NCAA member institutions.
+    # for NCAA member institutions.
     season = f"{season_name[0:2]}{season_name[-2:]}"
     season = int(season)
 
@@ -1976,7 +1977,7 @@ def get_baseball_player_season_fielding_stats(
     # and ends in the fall semester.
     # Thus, if `season_name` = "2011-12", this is the "2012" baseball season,
     # because 2012 would encompass the spring and fall semesters
-    # # for NCAA member institutions.
+    # for NCAA member institutions.
     season = f"{season_name[0:2]}{season_name[-2:]}"
     season = int(season)
 

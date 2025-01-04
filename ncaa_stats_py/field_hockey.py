@@ -7,6 +7,7 @@
 # - 2024-11-08 08:15 PM EST
 # - 2024-11-25 07:45 PM EDT
 # - 2024-11-25 08:20 PM EDT
+# - 2025-01-04 03:00 PM EDT
 
 import logging
 import re
@@ -535,7 +536,7 @@ def get_field_hockey_team_schedule(team_id: int) -> pd.DataFrame:
         # this means that this game is an extra innings game.
         # The number encased in `()` is the actual number of innings.
         # We need to remove that from the date,
-        # # and move it into a separate variable.
+        # and move it into a separate variable.
         if "(" in game_date:
             game_date = game_date.replace(")", "")
             game_date, game_num = game_date.split("(")
@@ -1130,7 +1131,7 @@ def get_field_hockey_team_roster(team_id: int) -> pd.DataFrame:
     # Thus, if `season_name` = "2011-12",
     # this is the "2012" field_hockey season,
     # because 2012 would encompass the spring and fall semesters
-    # # for NCAA member institutions.
+    # for NCAA member institutions.
     season = f"{season_name[0:2]}{season_name[-2:]}"
     season = int(season)
 
