@@ -1,5 +1,18 @@
 # `ncaa_stats_py` Changelog
 
+## 0.0.6: The "Lacrosse" update
+- Implemented `ncaa_stats_py.lacrosse.get_lacrosse_teams()`, a function that allows you to get a list of NCAA lacrosse teams for a season and level.
+- Implemented `ncaa_stats_py.lacrosse.load_lacrosse_teams()`, a function that builds on top of `ncaa_stats_py.lacrosse.get_lacrosse_teams()`, and retrieves a list of all possible lacrosse teams from 2008 to present day.
+- Implemented `ncaa_stats_py.lacrosse.get_lacrosse_team_schedule()`, a function that allows you to get a schedule for a specific lacrosse team.
+- Implemented `ncaa_stats_py.lacrosse.get_full_lacrosse_schedule()`, a function that builds on top of `ncaa_stats_py.lacrosse.get_lacrosse_team_schedule()` and allows you to get the entire lacrosse schedule for a given season and level.
+- Implemented `ncaa_stats_py.lacrosse.get_lacrosse_team_roster()`, a function that allows one to get a full team roster from a given team ID.
+- Implemented `ncaa_stats_py.lacrosse.get_lacrosse_player_season_stats()`, a function that allows one to get a the season stats of players from a team through their team ID.
+- Implemented `ncaa_stats_py.lacrosse.get_lacrosse_player_game_stats()`, a function that allows one to get a the game stats of a player given a season, and player ID.
+- Implemented `ncaa_stats_py.lacrosse.get_lacrosse_game_player_stats()`, a function that allows one to get a the game stats of a player given a valid game ID.
+- Implemented `ncaa_stats_py.lacrosse.get_lacrosse_game_team_stats()`, a function that allows one to get a the team game stats given a valid game ID.
+- Implemented `ncaa_stats_py.lacrosse.get_lacrosse_raw_pbp()`, to parse play-by-play data, and normalize the data into something that can be parsed at a later date.
+- Set the package version to `0.0.6`.
+
 ## 0.0.5: The "Softball" update
 - Implemented `ncaa_stats_py.softball.get_softball_teams()`, a function that allows you to get a list of NCAA softball teams for a season and level.
 - Implemented `ncaa_stats_py.softball.load_softball_teams()`, a function that builds on top of `ncaa_stats_py.softball.get_softball_teams()`, and retrieves a list of all possible softball teams from 2008 to present day.
