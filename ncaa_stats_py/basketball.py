@@ -7,6 +7,7 @@
 # - 2024-11-01 12:10 AM EDT
 # - 2024-11-25 07:45 PM EDT
 # - 2025-01-04 03:00 PM EDT
+# - 2025-01-18 02:40 PM EDT
 
 import logging
 import re
@@ -1036,7 +1037,7 @@ def get_full_basketball_schedule(
 ) -> pd.DataFrame:
     """
     Retrieves a full basketball schedule,
-    from an NCAA level ("I", "II", "IIIs").
+    from an NCAA level (`"I"`, `"II"`, `"III"`).
     The way this is done is by going through every team in a division,
     and parsing the schedules of every team in a division.
 
@@ -1829,7 +1830,7 @@ def get_basketball_player_season_stats(
         },
         inplace=True,
     )
-    stats_df = stats_df.fillna(0)
+    stats_df = stats_df.infer_objects().fillna(0)
     stats_df = stats_df.astype(
         {
             "GP": "uint16",
@@ -2423,7 +2424,7 @@ def get_basketball_player_game_stats(
         errors="ignore"
     )
 
-    stats_df = stats_df.fillna(0)
+    stats_df = stats_df.infer_objects().fillna(0)
     stats_df = stats_df.astype(
         {
             "GP": "uint16",
@@ -2936,7 +2937,7 @@ def get_basketball_game_player_stats(game_id: int) -> pd.DataFrame:
         errors="ignore"
     )
 
-    stats_df = stats_df.fillna(0)
+    stats_df = stats_df.infer_objects().fillna(0)
     stats_df = stats_df.astype(
         {
             "GP": "uint16",

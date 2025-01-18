@@ -1,5 +1,19 @@
 # `ncaa_stats_py` Changelog
 
+## 0.0.7: The "Volleyball" update
+- Implemented `ncaa_stats_py.volleyball.get_volleyball_teams()`, a function that allows you to get a list of NCAA volleyball teams for a season and level.
+- Implemented `ncaa_stats_py.volleyball.load_volleyball_teams()`, a function that builds on top of `ncaa_stats_py.volleyball.get_volleyball_teams()`, and retrieves a list of all possible volleyball teams from 2008 to present day.
+- Implemented `ncaa_stats_py.volleyball.get_volleyball_team_schedule()`, a function that allows you to get a schedule for a specific volleyball team.
+- Implemented `ncaa_stats_py.volleyball.get_full_volleyball_schedule()`, a function that builds on top of `ncaa_stats_py.volleyball.get_volleyball_team_schedule()` and allows you to get the entire volleyball schedule for a given season and level.
+- Implemented `ncaa_stats_py.volleyball.get_volleyball_team_roster()`, a function that allows one to get a full team roster from a given team ID.
+- Implemented `ncaa_stats_py.volleyball.get_volleyball_player_season_stats()`, a function that allows one to get a the season stats of players from a team through their team ID.
+- Implemented `ncaa_stats_py.volleyball.get_volleyball_player_game_stats()`, a function that allows one to get a the game stats of a player given a season, and player ID.
+- Implemented `ncaa_stats_py.volleyball.get_volleyball_game_player_stats()`, a function that allows one to get a the game stats of a player given a valid game ID.
+- Implemented `ncaa_stats_py.volleyball.get_volleyball_raw_pbp()`, to parse raw play-by-play data, and normalize the data into something that can be parsed at a later date.
+- Implemented `ncaa_stats_py.volleyball.get_parsed_volleyball_pbp()`, to parse play-by-play data into a format that can be queried at a later date.
+- Fixed an issue related to an impending change/warning in pandas where `.fillna()` will no longer automatically convert columns with an `object` datatype, before a function can convert the column to the correct datatype (More information: https://stackoverflow.com/a/77941616).
+- Set the package version to `0.0.7`.
+
 ## 0.0.6: The "Lacrosse" update
 - Implemented `ncaa_stats_py.lacrosse.get_lacrosse_teams()`, a function that allows you to get a list of NCAA lacrosse teams for a season and level.
 - Implemented `ncaa_stats_py.lacrosse.load_lacrosse_teams()`, a function that builds on top of `ncaa_stats_py.lacrosse.get_lacrosse_teams()`, and retrieves a list of all possible lacrosse teams from 2008 to present day.
