@@ -7,6 +7,7 @@
 # - 2024-12-15 12:35 AM EDT
 # - 2024-12-17 10:30 AM EDT
 # - 2025-01-04 03:00 PM EDT
+# - 2025-01-18 02:40 PM EDT
 
 
 import logging
@@ -902,7 +903,8 @@ def get_full_softball_schedule(
     level: str | int = "I"
 ) -> pd.DataFrame:
     """
-    Retrieves a full softball schedule, from an NCAA level ("I", "II", "IIIs").
+    Retrieves a full softball schedule,
+    from an NCAA level (`"I"`, `"II"`, `"III"`).
     The way this is done is by going through every team in a division,
     and parsing the schedules of every team in a division.
 
@@ -4085,7 +4087,7 @@ def get_softball_game_player_stats(game_id: int) -> pd.DataFrame:
     if "pitching_IP" in stats_df.columns:
         stats_df = stats_df.reindex(columns=stat_columns)
 
-    stats_df = stats_df.fillna(0)
+    stats_df = stats_df.infer_objects().fillna(0)
     stats_df = stats_df.astype(
         {
             "game_id": "int64",

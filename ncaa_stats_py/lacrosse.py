@@ -6,6 +6,7 @@
 # - 2024-09-20 08:15 PM EDT
 # - 2024-12-18 02:18 PM EST
 # - 2025-01-04 03:00 PM EDT
+# - 2025-01-18 02:40 PM EDT
 
 
 import logging
@@ -1084,7 +1085,7 @@ def get_full_lacrosse_schedule(
 ) -> pd.DataFrame:
     """
     Retrieves a full lacrosse schedule,
-    from an NCAA level ("I", "II", "IIIs").
+    from an NCAA level (`"I"`, `"II"`, `"III"`).
     The way this is done is by going through every team in a division,
     and parsing the schedules of every team in a division.
 
@@ -2044,7 +2045,7 @@ def get_lacrosse_player_season_stats(
     stats_df["team_id"] = team_id
     stats_df["sport_id"] = sport_id
 
-    print(stats_df.columns)
+    # print(stats_df.columns)
     for i in stats_df.columns:
         if i in stat_columns:
             pass
@@ -3116,7 +3117,7 @@ def get_lacrosse_game_player_stats(game_id: int) -> pd.DataFrame:
 
     # print(stats_df.columns)
 
-    stats_df = stats_df.fillna(0)
+    stats_df = stats_df.infer_objects().fillna(0)
     stats_df["season"] = season
     stats_df["game_date"] = game_date_str
     stats_df = stats_df.astype(

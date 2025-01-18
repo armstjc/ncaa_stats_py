@@ -11,6 +11,7 @@
 # - 2024-11-25 07:45 PM EDT
 # - 2024-12-17 10:30 AM EDT
 # - 2025-01-04 03:00 PM EDT
+# - 2025-01-18 02:40 PM EDT
 
 
 import logging
@@ -604,6 +605,41 @@ def _stat_id_dict() -> dict:
                 "non_goalkeepers": 15562
             },
         },
+        "womens_volleyball": {  # Women's basketball
+            2025: {"season": 2025},
+            2024: {"season": 2024},
+            2023: {"season": 2023},
+            2022: {"season": 2022},
+            2021: {"season": 2021},
+            2020: {"season": 2020},
+            2019: {"season": 2019},
+            2018: {"season": 2018},
+            2017: {"season": 2017},
+            2016: {"season": 2016},
+            2015: {"season": 2015},
+            2014: {"season": 2014},
+            2013: {"season": 2013},
+            2012: {"season": 2012},
+            2011: {"season": 2011},
+            2010: {"season": 2010},
+        },
+        "mens_volleyball": {  # Men's basketball
+            2025: {"season": 2025},
+            2024: {"season": 2024},
+            2023: {"season": 2023},
+            2022: {"season": 2022},
+            2021: {"season": 2021},
+            2020: {"season": 2020},
+            2019: {"season": 2019},
+            2018: {"season": 2018},
+            2017: {"season": 2017},
+            2016: {"season": 2016},
+            2015: {"season": 2015},
+            2014: {"season": 2014},
+            2013: {"season": 2013},
+            2012: {"season": 2012},
+            2011: {"season": 2011},
+        },
     }
     return stat_id_dict
 
@@ -621,7 +657,7 @@ def _get_webpage(url: str) -> requests.Response:
     """ """
     rng = SystemRandom()
     headers = _web_headers()
-    response = requests.get(headers=headers, url=url, timeout=20)
+    response = requests.get(headers=headers, url=url, timeout=30)
     random_integer = 5 + rng.randint(a=0, b=5)
     time.sleep(random_integer)
     if response.status_code == 200:
@@ -838,6 +874,26 @@ def _get_seconds_from_time_str(time_str: str) -> int:
     t_seconds = int(t_seconds)
     time_seconds = (t_minutes * 60) + t_seconds
     return time_seconds
+
+
+def _name_smother(name_str: str) -> str:
+    # name_str = name_str.replace("3a")
+    if name_str is None:
+        return name_str
+    elif " (" in name_str:
+        name_str = name_str.split(" (")[0]
+    elif ", block error" in name_str:
+        name_str = name_str.split(", block error")[0]
+
+    if "," not in name_str:
+        return name_str
+    elif name_str.count(",") > name_str.count(" "):
+        l_name, f_name = name_str.split(",")
+        name_str = f"{f_name} {l_name}"
+        return name_str
+    else:
+        # raise ValueError(f"unhandled string {name_str}")
+        return name_str
 
 
 if __name__ == "__main__":

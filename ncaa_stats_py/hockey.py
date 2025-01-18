@@ -7,6 +7,7 @@
 # - 2024-11-28 08:15 PM EDT
 # - 2024-12-15 09:15 PM EDT
 # - 2025-01-04 03:00 PM EDT
+# - 2025-01-18 02:40 PM EDT
 
 
 import logging
@@ -120,7 +121,6 @@ def get_hockey_teams(
     )
     df = get_hockey_teams(2019, "III", get_womens_hockey_data=True)
     print(df)
-
 
     ```
     Returns
@@ -994,7 +994,7 @@ def get_full_hockey_schedule(
 ) -> pd.DataFrame:
     """
     Retrieves a full hockey schedule,
-    from an NCAA level ("I", "II", "IIIs").
+    from an NCAA level (`"I"`, `"II"`, `"III"`).
     The way this is done is by going through every team in a division,
     and parsing the schedules of every team in a division.
 
@@ -3098,7 +3098,7 @@ def get_hockey_game_player_stats(game_id: int) -> pd.DataFrame:
 
     # print(stats_df.columns)
 
-    stats_df = stats_df.fillna(0)
+    stats_df = stats_df.infer_objects().fillna(0)
     stats_df["season"] = season
     stats_df = stats_df.astype(
         {

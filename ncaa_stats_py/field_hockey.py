@@ -8,6 +8,7 @@
 # - 2024-11-25 07:45 PM EDT
 # - 2024-11-25 08:20 PM EDT
 # - 2025-01-04 03:00 PM EDT
+# - 2025-01-18 02:40 PM EDT
 
 import logging
 import re
@@ -847,7 +848,7 @@ def get_full_field_hockey_schedule(
 ) -> pd.DataFrame:
     """
     Retrieves a full field hockey schedule,
-    from an NCAA level ("I", "II", "IIIs").
+    from an NCAA level (`"I"`, `"II"`, `"III"`).
     The way this is done is by going through every team in a division,
     and parsing the schedules of every team in a division.
 
@@ -2177,7 +2178,7 @@ def get_field_hockey_game_player_stats(game_id: int) -> pd.DataFrame:
 
     # print(stats_df.columns)
 
-    stats_df = stats_df.fillna(0)
+    stats_df = stats_df.infer_objects().fillna(0)
     stats_df["goalie_GAA"] = stats_df["goalie_GAA"].astype("string")
     stats_df["goalie_GAA"] = stats_df["goalie_GAA"].str.replace(",", "")
     stats_df["season"] = season
