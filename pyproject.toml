@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ncaa_stats_py"
-version = "0.0.7"
+version = "0.0.8"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -38,7 +38,8 @@ dependencies = [
     "requests>=2.32.3",
     "lxml>=5.3",
     "pytz>=2024.2",
-    "beautifulsoup4>=4.12.2"
+    "beautifulsoup4>=4.12.3",
+    "python-dateutil>=2.9.0"
 ]
 
 [project.urls]

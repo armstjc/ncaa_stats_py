@@ -1,5 +1,43 @@
 # `ncaa_stats_py` Changelog
 
+## 0.0.8: The "Convenience" update
+- Fixed a bug in `ncaa_stats_py.lacrosse.load_lacrosse_teams()` that would cause the function to crash in certain conditions before games would be played in a calendar year.
+- For the following functions, `[player_first_name]` and `[player_last_name]` are now added as columns within the returned `pandas` `DataFrame`:
+    - `ncaa_stats_py.baseball.get_baseball_team_roster()`
+    - `ncaa_stats_py.basketball.get_basketball_team_roster()`
+    - `ncaa_stats_py.field_hockey.get_field_hockey_team_roster()`
+    - `ncaa_stats_py.hockey.get_hockey_team_roster()`
+    - `ncaa_stats_py.lacrosse.get_lacrosse_team_roster()`
+    - `ncaa_stats_py.softball.get_softball_team_roster()`
+    - `ncaa_stats_py.volleyball.get_volleyball_team_roster()`
+- For `ncaa_stats_py.baseball.get_baseball_game_player_stats()`, a `[game_datetime]` column has been added.
+- For the following functions, columns will now be ordered and standardized across function calls:
+    - `ncaa_stats_py.baseball.get_baseball_team_roster()`
+    - `ncaa_stats_py.baseball.get_baseball_player_season_batting_stats()`
+    - `ncaa_stats_py.baseball.get_baseball_player_season_pitching_stats()`
+    - `ncaa_stats_py.baseball.get_baseball_player_season_fielding_stats()`
+    - `ncaa_stats_py.baseball.get_baseball_player_game_batting_stats()`
+    - `ncaa_stats_py.baseball.get_baseball_player_game_pitching_stats()`
+    - `ncaa_stats_py.baseball.get_baseball_player_game_fielding_stats()`
+    - `ncaa_stats_py.basketball.get_basketball_team_roster()`
+    - `ncaa_stats_py.field_hockey.get_field_hockey_team_roster()`
+    - `ncaa_stats_py.field_hockey.get_field_hockey_player_season_stats()`
+    - `ncaa_stats_py.hockey.get_hockey_player_season_stats()`
+- Fixed an issue within `ncaa_stats_py.baseball.get_baseball_player_season_pitching_stats()` where pitching appearances and games played would be combined, regardless of the position(s) the player played in that season.
+- Added the ability to get all games for a sport, a season, and an NCAA level/division with the help of these functions:
+    - `ncaa_stats_py.baseball.get_baseball_day_schedule()`
+    - `ncaa_stats_py.basketball.get_basketball_day_schedule()`
+    - `ncaa_stats_py.field_hockey.get_field_hockey_day_schedule()`
+    - `ncaa_stats_py.hockey.get_hockey_day_schedule()`
+    - `ncaa_stats_py.lacrosse.get_lacrosse_day_schedule()`
+    - `ncaa_stats_py.softball.get_softball_day_schedule()`
+    - `ncaa_stats_py.volleyball.get_volleyball_day_schedule()`
+- Altered the warning message that will appear when team information is not cached, or the cached data needs to be refreshed.
+- Added the `python-dateutil` python package to the list of required python packages for `ncaa_stats_py` to install.
+- Upped the required version of `beautifulsoup4` from `4.12.2` to `4.12.3`
+- Upped the required version of `pytz` from `2024.1` to `2025.1`
+- Set the package version to `0.0.8`.
+
 ## 0.0.7: The "Volleyball" update
 - Implemented `ncaa_stats_py.volleyball.get_volleyball_teams()`, a function that allows you to get a list of NCAA volleyball teams for a season and level.
 - Implemented `ncaa_stats_py.volleyball.load_volleyball_teams()`, a function that builds on top of `ncaa_stats_py.volleyball.get_volleyball_teams()`, and retrieves a list of all possible volleyball teams from 2008 to present day.

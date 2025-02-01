@@ -18,6 +18,7 @@ from os.path import exists, expanduser, getmtime
 
 import numpy as np
 import pandas as pd
+from dateutil import parser
 from bs4 import BeautifulSoup
 from pytz import timezone
 from tqdm import tqdm
@@ -49,6 +50,7 @@ def get_softball_teams(season: int, level: str | int) -> pd.DataFrame:
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import get_softball_teams
 
     # Get all D1 softball teams for the 2024 season.
@@ -82,6 +84,7 @@ def get_softball_teams(season: int, level: str | int) -> pd.DataFrame:
     print(df)
 
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a list of college softball teams
@@ -173,8 +176,8 @@ def get_softball_teams(season: int, level: str | int) -> pd.DataFrame:
         return teams_df
 
     logging.warning(
-        f"Could not load {season} D{level} schools from cache, "
-        + "re-downloading that list of schools now."
+        f"Either we could not load {season} D{level} schools from cache, "
+        + "or it's time to refresh the cached data."
     )
     schools_df = _get_schools()
     url = (
@@ -332,6 +335,7 @@ def load_softball_teams(start_year: int = 2008) -> pd.DataFrame:
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import load_softball_teams
 
     # Compile a list of known softball teams
@@ -343,6 +347,7 @@ def load_softball_teams(start_year: int = 2008) -> pd.DataFrame:
     df = load_softball_teams()
     print(df)
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a list of
@@ -390,6 +395,7 @@ def get_softball_team_schedule(team_id: int) -> pd.DataFrame:
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import get_softball_team_schedule
 
     # Get the team schedule for the
@@ -526,8 +532,6 @@ def get_softball_team_schedule(team_id: int) -> pd.DataFrame:
         return games_df
 
     response = _get_webpage(url=url)
-    # with open("test.html", "w+") as f:
-    #     f.write(response.text)
     soup = BeautifulSoup(response.text, features="lxml")
 
     school_name = soup.find("div", {"class": "card"}).find("img").get("alt")
@@ -889,13 +893,379 @@ def get_softball_team_schedule(team_id: int) -> pd.DataFrame:
     return games_df
 
 
-def get_softball_day_schedule(game_date: str | date | datetime):
+def get_softball_day_schedule(
+    game_date: str | date | datetime,
+    level: str | int = "I",
+):
     """
+    Given a date and NCAA level, this function retrieves softball every game
+    for that date.
+
+    Parameters
+    ----------
+    `game_date` (int, mandatory):
+        Required argument.
+        Specifies the date you want a softball schedule from.
+        For best results, pass a string formatted as "YYYY-MM-DD".
+
+    `level` (int, mandatory):
+        Required argument.
+        Specifies the level/division you want a
+        NCAA softball schedule from.
+        This can either be an integer (1-3) or a string ("I"-"III").
+
+    Usage
+    ----------
+    ```python
+
+    from ncaa_stats_py.softball import get_softball_day_schedule
+
+    # Get all DI games that will be played on April 14th, 2025.
+    print("Get all games that will be played on April 14th, 2025.")
+    df = get_softball_day_schedule("2025-04-14", level=1)
+    print(df)
+
+    # Get all DI games that were played on February 14th, 2025.
+    print("Get all games that were played on February 14th, 2025.")
+    df = get_softball_day_schedule("2025-02-14", level="I")
+    print(df)
+
+    # Get all division II games that were played on February 14th, 2025.
+    print("Get all division II games that were played on February 14th, 2025.")
+    df = get_softball_day_schedule("2025-02-14", level="II")
+    print(df)
+
+    # Get all DI games (if any) that were played on June 24th, 2024.
+    print("Get all DI games (if any) that were played on June 24th, 2024.")
+    df = get_softball_day_schedule("2024-06-24")
+    print(df)
+
+    # Get all DI games played on March 3rd, 2024.
+    print("Get all DI games played on March 3rd, 2024.")
+    df = get_softball_day_schedule("2024-03-03")
+    print(df)
+
+    # Get all division III games played on April 4th, 2024.
+    print("Get all division III games played on April 4th, 2024.")
+    df = get_softball_day_schedule("2024-04-04")
+    print(df)
+
+    ```
+
+    Returns
+    ----------
+    A pandas `DataFrame` object with all softball games played on that day,
+    for that NCAA division/level.
 
     """
-    raise NotImplementedError(
-        "Its not ready."
+
+    season = 0
+    sport_id = "WSB"
+
+    schedule_df = pd.DataFrame()
+    schedule_df_arr = []
+
+    if isinstance(game_date, date):
+        game_datetime = datetime.combine(
+            game_date, datetime.min.time()
+        )
+    elif isinstance(game_date, datetime):
+        game_datetime = game_date
+    elif isinstance(game_date, str):
+        game_datetime = parser.parse(
+            game_date
+        )
+    else:
+        unhandled_datatype = type(game_date)
+        raise ValueError(
+            f"Unhandled datatype for `game_date`: `{unhandled_datatype}`"
+        )
+
+    if isinstance(level, int) and level == 1:
+        formatted_level = "I"
+        ncaa_level = 1
+    elif isinstance(level, int) and level == 2:
+        formatted_level = "II"
+        ncaa_level = 2
+    elif isinstance(level, int) and level == 3:
+        formatted_level = "III"
+        ncaa_level = 3
+    elif isinstance(level, str) and (
+        level.lower() == "i" or level.lower() == "d1" or level.lower() == "1"
+    ):
+        ncaa_level = 1
+        formatted_level = level.upper()
+    elif isinstance(level, str) and (
+        level.lower() == "ii" or level.lower() == "d2" or level.lower() == "2"
+    ):
+        ncaa_level = 2
+        formatted_level = level.upper()
+    elif isinstance(level, str) and (
+        level.lower() == "iii" or level.lower() == "d3" or level.lower() == "3"
+    ):
+        ncaa_level = 3
+        formatted_level = level.upper()
+
+    del level
+
+    season = game_datetime.year
+    game_month = game_datetime.month
+    game_day = game_datetime.day
+    game_year = game_datetime.year
+
+    url = (
+        "https://stats.ncaa.org/contests/" +
+        f"livestream_scoreboards?utf8=%E2%9C%93&sport_code={sport_id}" +
+        f"&academic_year={season}&division={ncaa_level}" +
+        f"&game_date={game_month:00d}%2F{game_day:00d}%2F{game_year}" +
+        "&commit=Submit"
     )
+
+    response = _get_webpage(url=url)
+    soup = BeautifulSoup(response.text, features="lxml")
+
+    game_boxes = soup.find_all("div", {"class": "table-responsive"})
+
+    for box in game_boxes:
+        game_id = None
+        game_alt_text = None
+        game_num = 1
+        # t_box = box.find("table")
+        table_box = box.find("table")
+        table_rows = table_box.find_all("tr")
+
+        # Date/attendance
+        game_date_str = table_rows[0].find("div", {"class": "col-6 p-0"}).text
+        game_date_str = game_date_str.replace("\n", "")
+        game_date_str = game_date_str.strip()
+        game_date_str = game_date_str.replace("TBA ", "TBA")
+        game_date_str = game_date_str.replace("TBD ", "TBD")
+        game_date_str = game_date_str.replace("PM ", "PM")
+        game_date_str = game_date_str.replace("AM ", "AM")
+        game_date_str = game_date_str.strip()
+        attendance_str = table_rows[0].find(
+            "div",
+            {"class": "col p-0 text-right"}
+        ).text
+
+        attendance_str = attendance_str.replace("Attend:", "")
+        attendance_str = attendance_str.replace(",", "")
+        attendance_str = attendance_str.replace("\n", "")
+        if (
+            "st" in attendance_str.lower() or
+            "nd" in attendance_str.lower() or
+            "rd" in attendance_str.lower() or
+            "th" in attendance_str.lower()
+        ):
+            # This is not an attendance,
+            # this is whatever quarter/half/inning this game is in.
+            attendance_num = None
+        elif "final" in attendance_str.lower():
+            attendance_num = None
+        elif len(attendance_str) > 0:
+            attendance_num = int(attendance_str)
+        else:
+            attendance_num = None
+
+        if "(" in game_date_str:
+            game_date_str = game_date_str.replace(")", "")
+            game_date_str, game_num = game_date_str.split("(")
+            game_num = int(game_num)
+
+        if "TBA" in game_date_str:
+            game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y TBA')
+        elif "tba" in game_date_str:
+            game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y tba')
+        elif "TBD" in game_date_str:
+            game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y TBD')
+        elif "tbd" in game_date_str:
+            game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y tbd')
+        elif (
+            "tbd" not in game_date_str.lower() and
+            ":" not in game_date_str.lower()
+        ):
+            game_date_str = game_date_str.replace(" ", "")
+            game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y')
+        else:
+            game_datetime = datetime.strptime(
+                game_date_str,
+                '%m/%d/%Y %I:%M %p'
+            )
+        game_datetime = game_datetime.astimezone(timezone("US/Eastern"))
+
+        game_alt_text = table_rows[1].find_all("td")[0].text
+        if game_alt_text is not None and len(game_alt_text) > 0:
+            game_alt_text = game_alt_text.replace("\n", "")
+            game_alt_text = game_alt_text.strip()
+
+        if len(game_alt_text) == 0:
+            game_alt_text = None
+
+        urls_arr = box.find_all("a")
+
+        for u in urls_arr:
+            url_temp = u.get("href")
+            if "contests" in url_temp:
+                game_id = url_temp
+                del url_temp
+
+        if game_id is None:
+            for r in range(0, len(table_rows)):
+                temp = table_rows[r]
+                temp_id = temp.get("id")
+
+                if temp_id is not None and len(temp_id) > 0:
+                    game_id = temp_id
+
+        del urls_arr
+
+        game_id = game_id.replace("/contests", "")
+        game_id = game_id.replace("/box_score", "")
+        game_id = game_id.replace("/livestream_scoreboards", "")
+        game_id = game_id.replace("/", "")
+        game_id = game_id.replace("contest_", "")
+        game_id = int(game_id)
+
+        table_rows = table_box.find_all("tr", {"id": f"contest_{game_id}"})
+        away_team_row = table_rows[0]
+        home_team_row = table_rows[1]
+
+        # Away team
+        td_arr = away_team_row.find_all("td")
+
+        if "canceled" in td_arr[5].text.lower():
+            continue
+        elif "ppd" in td_arr[-1].text.lower():
+            continue
+
+        try:
+            away_team_name = td_arr[0].find("img").get("alt")
+        except Exception:
+            away_team_name = td_arr[1].text
+        away_team_name = away_team_name.replace("\n", "")
+        away_team_name = away_team_name.strip()
+
+        try:
+            away_team_id = td_arr[1].find("a").get("href")
+            away_team_id = away_team_id.replace("/teams/", "")
+            away_team_id = int(away_team_id)
+        except AttributeError:
+            away_team_id = None
+            logging.info("No team ID found for the away team")
+        except Exception as e:
+            raise e
+
+        away_runs_scored = td_arr[-3].text
+        away_runs_scored = away_runs_scored.replace("\n", "")
+        away_runs_scored = away_runs_scored.replace("\xa0", "")
+
+        if len(away_runs_scored) > 0:
+            away_runs_scored = int(away_runs_scored)
+        else:
+            away_runs_scored = 0
+
+        away_hits = td_arr[-2].text
+        away_hits = away_hits.replace("\n", "")
+        away_hits = away_hits.replace("\xa0", "")
+        if len(away_hits) > 0:
+            away_hits = int(away_hits)
+        else:
+            away_hits = 0
+
+        away_errors = td_arr[-1].text
+        away_errors = away_errors.replace("\n", "")
+        away_errors = away_errors.replace("\xa0", "")
+        if len(away_errors) > 0:
+            away_errors = int(away_errors)
+        else:
+            away_errors = 0
+
+        del td_arr
+
+        # Home team
+        td_arr = home_team_row.find_all("td")
+
+        try:
+            home_team_name = td_arr[0].find("img").get("alt")
+        except Exception:
+            home_team_name = td_arr[1].text
+        home_team_name = home_team_name.replace("\n", "")
+        home_team_name = home_team_name.strip()
+
+        try:
+            home_team_id = td_arr[1].find("a").get("href")
+            home_team_id = home_team_id.replace("/teams/", "")
+            home_team_id = int(home_team_id)
+        except AttributeError:
+            home_team_id = None
+            logging.info("No team ID found for the home team")
+        except Exception as e:
+            raise e
+
+        home_runs_scored = td_arr[-3].text
+        home_runs_scored = home_runs_scored.replace("\n", "")
+        home_runs_scored = home_runs_scored.replace("\xa0", "")
+        if len(home_runs_scored) > 0:
+            home_runs_scored = int(home_runs_scored)
+        else:
+            home_runs_scored = 0
+
+        home_hits = td_arr[-2].text
+        home_hits = home_hits.replace("\n", "")
+        home_hits = home_hits.replace("\xa0", "")
+        if len(home_hits) > 0:
+            home_hits = int(home_hits)
+        else:
+            home_hits = 0
+
+        home_errors = td_arr[-1].text
+        home_errors = home_errors.replace("\n", "")
+        home_errors = home_errors.replace("\xa0", "")
+        if len(home_errors) > 0:
+            home_errors = int(home_errors)
+        else:
+            home_errors = 0
+
+        temp_df = pd.DataFrame(
+            {
+                "season": season,
+                "sport_id": sport_id,
+                "game_date": game_datetime.strftime("%Y-%m-%d"),
+                "game_datetime": game_datetime.isoformat(),
+                "game_id": game_id,
+                "formatted_level": formatted_level,
+                "ncaa_level": ncaa_level,
+                "game_alt_text": game_alt_text,
+                "away_team_id": away_team_id,
+                "away_team_name": away_team_name,
+                "home_team_id": home_team_id,
+                "home_team_name": home_team_name,
+                "home_runs_scored": home_runs_scored,
+                "home_hits": home_hits,
+                "home_errors": home_errors,
+                "away_runs_scored": away_runs_scored,
+                "away_hits": away_hits,
+                "away_errors": away_errors,
+                "attendance": attendance_num
+            },
+            index=[0]
+        )
+        schedule_df_arr.append(temp_df)
+
+        del temp_df
+
+    if len(schedule_df_arr) >= 1:
+        schedule_df = pd.concat(schedule_df_arr, ignore_index=True)
+    else:
+        logging.warning(
+            "Could not find any game(s) for "
+            + f"{game_datetime.year:00d}-{game_datetime.month:00d}"
+            + f"-{game_datetime.day:00d}. "
+            + "If you believe this is an error, "
+            + "please raise an issue at "
+            + "\n https://github.com/armstjc/ncaa_stats_py/issues \n"
+        )
+    return schedule_df
 
 
 def get_full_softball_schedule(
@@ -921,6 +1291,7 @@ def get_full_softball_schedule(
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import get_full_softball_schedule
 
     # Get the entire 2024 schedule for the 2024 D1 softball season.
@@ -1067,6 +1438,7 @@ def get_softball_team_roster(team_id: int) -> pd.DataFrame:
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import get_softball_team_roster
 
     # Get the roster of the 2024 Oregon softball team (D1, ID: 571950).
@@ -1118,6 +1490,7 @@ def get_softball_team_roster(team_id: int) -> pd.DataFrame:
     print(df)
 
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with
@@ -1131,6 +1504,33 @@ def get_softball_team_roster(team_id: int) -> pd.DataFrame:
     load_from_cache = True
     home_dir = expanduser("~")
     home_dir = _format_folder_str(home_dir)
+
+    stat_columns = [
+        "season",
+        "season_name",
+        "sport_id",
+        "ncaa_division",
+        "ncaa_division_formatted",
+        "team_conference_name",
+        "school_id",
+        "school_name",
+        "player_id",
+        "player_jersey_num",
+        "player_full_name",
+        "player_first_name",
+        "player_last_name",
+        "player_class",
+        "player_positions",
+        "player_height_string",
+        "player_weight",
+        "player_batting_hand",
+        "player_throwing_hand",
+        "player_hometown",
+        "player_high_school",
+        "player_G",
+        "player_GS",
+        "player_url",
+    ]
 
     team_df = load_softball_teams()
 
@@ -1193,8 +1593,6 @@ def get_softball_team_roster(team_id: int) -> pd.DataFrame:
         return teams_df
 
     response = _get_webpage(url=url)
-    with open("test.html", "w+") as f:
-        f.write(response.text)
     soup = BeautifulSoup(response.text, features="lxml")
     try:
         school_name = soup.find(
@@ -1268,6 +1666,41 @@ def get_softball_team_roster(team_id: int) -> pd.DataFrame:
     roster_df["school_id"] = school_id
     roster_df["school_name"] = school_name
     roster_df["sport_id"] = sport_id
+
+    roster_df.rename(
+        columns={
+            "GP": "player_G",
+            "GS": "player_GS",
+            "#": "player_jersey_num",
+            "Name": "player_full_name",
+            "Class": "player_class",
+            "Position": "player_positions",
+            "Height": "player_height_string",
+            "Bats": "player_batting_hand",
+            "Throws": "player_throwing_hand",
+            "Hometown": "player_hometown",
+            "High School": "player_high_school",
+        },
+        inplace=True
+    )
+
+    # print(roster_df.columns)
+
+    roster_df[["player_first_name", "player_last_name"]] = roster_df[
+        "player_full_name"
+    ].str.split(" ", n=1, expand=True)
+    roster_df = roster_df.infer_objects().replace(r'^\s*$', np.nan, regex=True)
+
+    for i in roster_df.columns:
+        if i in stat_columns:
+            pass
+        else:
+            raise ValueError(
+                f"Unhandled column name {i}"
+            )
+
+    roster_df = roster_df.infer_objects().reindex(columns=stat_columns)
+
     roster_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/softball/rosters/" +
         f"{team_id}_roster.csv",
@@ -1352,6 +1785,7 @@ def get_softball_player_season_batting_stats(
     print(df)
 
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with the season batting stats for
@@ -1500,8 +1934,6 @@ def get_softball_player_season_batting_stats(
         return games_df
 
     response = _get_webpage(url=url)
-    # with open("test.html", "w+") as f:
-    #     f.write(response.text)
     soup = BeautifulSoup(response.text, features="lxml")
     # try:
     #     school_name = soup.find(
@@ -1692,6 +2124,7 @@ def get_softball_player_season_pitching_stats(
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import (
         get_softball_player_season_pitching_stats
     )
@@ -1751,6 +2184,7 @@ def get_softball_player_season_pitching_stats(
     print(df)
 
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with the season pitching stats for
@@ -1903,8 +2337,6 @@ def get_softball_player_season_pitching_stats(
         return games_df
 
     response = _get_webpage(url=url)
-    # with open("test.html", "w+") as f:
-    #     f.write(response.text)
     soup = BeautifulSoup(response.text, features="lxml")
     # try:
     #     school_name = soup.find(
@@ -2078,6 +2510,7 @@ def get_softball_player_season_fielding_stats(
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import (
         get_softball_player_season_fielding_stats
     )
@@ -2137,6 +2570,7 @@ def get_softball_player_season_fielding_stats(
     print(df)
 
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with the season fielding stats for
@@ -2427,6 +2861,7 @@ def get_softball_player_game_batting_stats(
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import (
         get_softball_player_game_batting_stats
     )
@@ -2475,6 +2910,7 @@ def get_softball_player_game_batting_stats(
     print(df)
 
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a player's batting game logs
@@ -2487,6 +2923,51 @@ def get_softball_player_game_batting_stats(
     temp_df = pd.DataFrame()
     home_dir = expanduser("~")
     home_dir = _format_folder_str(home_dir)
+
+    stat_columns = [
+        "season",
+        "sport_id",
+        "date",
+        "game_id",
+        "game_num",
+        "game_innings",
+        "opponent_team_id",
+        "opponent",
+        "team_score",
+        "opponent_score",
+        "result",
+        "player_id",
+
+        "batting_G",
+        "batting_R",
+        "batting_AB",
+        "batting_H",
+        "batting_2B",
+        "batting_3B",
+        "batting_TB",
+        "batting_HR",
+        "batting_RBI",
+        "batting_BB",
+        "batting_HBP",
+        "batting_SF",
+        "batting_SH",
+
+        "batting_SO",
+        "batting_GO",
+        "batting_FO",
+        "batting_PK",
+        "batting_KL",
+
+        "batting_OPP_DP",
+        "batting_SBA",
+        "batting_CS",
+        "batting_SB",
+        "batting_IBB",
+        "batting_DP",
+        "batting_GDP",
+        "batting_TP",
+        "batting_RBI2out",
+    ]
 
     stat_id = _get_stat_id(
         sport="softball",
@@ -2570,8 +3051,6 @@ def get_softball_player_game_batting_stats(
     response = _get_webpage(url=url)
     soup = BeautifulSoup(response.text, features="lxml")
 
-    # with open("test.html", "w+") as f:
-    #     f.write(response.text)
 
     table_data = soup.find_all(
         "table", {"class": "small_font dataTable table-bordered"}
@@ -2781,14 +3260,40 @@ def get_softball_player_game_batting_stats(
             "OPP DP": "batting_OPP_DP",
             "CS": "batting_CS",
             "Picked": "batting_PK",
+            "SBA": "batting_SBA",
             "SB": "batting_SB",
+            "KL": "batting_KL",
             "IBB": "batting_IBB",
+            "GO": "batting_GO",
+            "FO": "batting_FO",
             "GDP": "batting_GDP",
+            "TP": "batting_TP",
+            "DP": "batting_DP",
             "RBI2out": "batting_RBI2out",
         },
         inplace=True,
     )
     stats_df = stats_df.infer_objects()
+    # print(stats_df.columns)
+
+    if "batting_BB" in stats_df.columns and "BB_1" in stats_df.columns:
+        stats_df["batting_BB"] = stats_df["batting_BB"] + stats_df["BB_1"]
+        stats_df.drop(
+            columns=["BB_1"],
+            inplace=True
+        )
+
+    for i in stats_df.columns:
+        if i in stat_columns:
+            pass
+        else:
+            raise ValueError(
+                f"Unhandled column name {i}"
+            )
+
+    stats_df = stats_df.reindex(
+        columns=stat_columns
+    )
 
     stats_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/softball/"
@@ -2820,6 +3325,7 @@ def get_softball_player_game_pitching_stats(
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import (
         get_softball_player_game_pitching_stats
     )
@@ -2851,7 +3357,9 @@ def get_softball_player_game_pitching_stats(
         player_id=7503990, season=2022
     )
     print(df)
+
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a player's pitching game logs
@@ -2865,6 +3373,59 @@ def get_softball_player_game_pitching_stats(
     temp_df = pd.DataFrame()
     home_dir = expanduser("~")
     home_dir = _format_folder_str(home_dir)
+
+    stat_columns = [
+        "season",
+        "sport_id",
+        "date",
+        "game_id",
+        "game_num",
+        "game_innings",
+        "opponent_team_id",
+        "opponent",
+        "team_score",
+        "opponent_score",
+        "result",
+        "player_id",
+
+        "pitching_G",
+        "pitching_APP",
+        "pitching_GS",
+        "pitching_order_appeared",
+        "pitching_W",
+        "pitching_L",
+        "pitching_SV",
+        "pitching_IP_str",
+        "pitching_IP",
+        "pitching_CG",
+        "pitching_H",
+        "pitching_R",
+        "pitching_ER",
+        "pitching_BB",
+        "pitching_SO",
+        "pitching_SHO",
+        "pitching_BF",
+        "pitching_AB",
+        "pitching_2B",
+        "pitching_3B",
+        "pitching_BK",
+        "pitching_HR",
+        "pitching_WP",
+        "pitching_HBP",
+        "pitching_IBB",
+        "pitching_IR",
+        "pitching_IRS",
+        "pitching_SH",
+        "pitching_SF",
+        "pitching_PI",
+        "pitching_illegal_pitch",
+        "pitching_GO",
+        "pitching_FO",
+        "pitching_KL",
+        "pitching_PK",
+        "pitching_CSO",
+        "pitching_CIA",
+    ]
 
     stat_id = _get_stat_id(
         sport="softball",
@@ -3135,6 +3696,7 @@ def get_softball_player_game_pitching_stats(
             "HR-A": "pitching_HR",
             "WP": "pitching_WP",
             "H": "pitching_H",
+            "HA": "pitching_H",
             "R": "pitching_R",
             "ER": "pitching_ER",
             "BB": "pitching_BB",
@@ -3156,11 +3718,28 @@ def get_softball_player_game_pitching_stats(
             "OrdAppeared": "pitching_order_appeared",
             "KL": "pitching_KL",
             "pickoffs": "pitching_PK",
+            "CSO": "pitching_CSO",
+            "Ill. Pitch.": "pitching_illegal_pitch",
+            "CIA": "pitching_CIA",
+            "BK": "pitching_BK",
         },
         inplace=True,
     )
     stats_df = stats_df.infer_objects()
 
+    # print(stats_df.columns)
+
+    for i in stats_df.columns:
+        if i in stat_columns:
+            pass
+        else:
+            raise ValueError(
+                f"Unhandled column name {i}"
+            )
+
+    stats_df = stats_df.reindex(
+        columns=stat_columns
+    )
     stats_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/softball/"
         + "player_game_stats/pitching/"
@@ -3192,6 +3771,7 @@ def get_softball_player_game_fielding_stats(
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import (
         get_softball_player_game_fielding_stats
     )
@@ -3252,6 +3832,7 @@ def get_softball_player_game_fielding_stats(
     print(df)
 
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a player's fielding game logs
@@ -3265,6 +3846,33 @@ def get_softball_player_game_fielding_stats(
     temp_df = pd.DataFrame()
     home_dir = expanduser("~")
     home_dir = _format_folder_str(home_dir)
+
+    stat_columns = [
+        "season",
+        "sport_id",
+        "date",
+        "game_id",
+        "game_num",
+        "game_innings",
+        "opponent_team_id",
+        "opponent",
+        "team_score",
+        "opponent_score",
+        "result",
+        "player_id",
+
+        "fielding_G",
+        "fielding_PO",
+        "fielding_A",
+        "fielding_TC",
+        "fielding_E",
+        "fielding_CI",
+        "fielding_PB",
+        "fielding_SBA",
+        "fielding_CSB",
+        "fielding_IDP",
+        "fielding_TP",
+    ]
 
     stat_id = _get_stat_id(
         sport="softball",
@@ -3529,16 +4137,35 @@ def get_softball_player_game_fielding_stats(
             "CI": "fielding_CI",
             "PB": "fielding_PB",
             "SBA": "fielding_SBA",
-            "CS": "fielding_CS",
+            "CS": "fielding_CSB",
             "IDP": "fielding_IDP",
             "TP": "fielding_TP",
+            "ITP": "fielding_TP",
+            "CSB": "fielding_CSB",
         },
         inplace=True,
     )
     stats_df = stats_df.infer_objects()
 
-    # ['SBA', 'CSB', 'IDP', 'TP', 'opponent_team_id', 'team_score',
-    #    'opponent_score', 'game_id', 'game_num', 'game_innings']
+    print(stats_df.columns)
+
+    for i in stats_df.columns:
+        if i in stat_columns:
+            pass
+        else:
+            raise ValueError(
+                f"Unhandled column name {i}"
+            )
+
+    stats_df = stats_df.reindex(
+        columns=stat_columns
+    )
+
+    stats_df.to_csv(
+        f"{home_dir}/.ncaa_stats_py/softball/player_game_stats/fielding/"
+        + f"{season}_{player_id}_player_game_fielding_stats.csv",
+        index=False
+    )
     return stats_df
 
 
@@ -3556,6 +4183,7 @@ def get_softball_game_player_stats(game_id: int) -> pd.DataFrame:
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import (
         get_softball_game_player_stats
     )
@@ -3638,6 +4266,7 @@ def get_softball_game_player_stats(game_id: int) -> pd.DataFrame:
     print(df)
 
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a player game stats in a given game.
@@ -4179,6 +4808,7 @@ def get_softball_game_team_stats(game_id: int) -> pd.DataFrame:
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import (
         get_softball_game_team_stats
     )
@@ -4261,6 +4891,7 @@ def get_softball_game_team_stats(game_id: int) -> pd.DataFrame:
     print(df)
 
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a team game stats in a given game.
@@ -4366,6 +4997,7 @@ def get_raw_softball_game_pbp(game_id: int):
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.softball import (
         get_raw_softball_game_pbp
     )
@@ -4421,6 +5053,7 @@ def get_raw_softball_game_pbp(game_id: int):
     )
     print(df)
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a play-by-play (PBP) data in a given game.

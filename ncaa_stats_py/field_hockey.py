@@ -19,6 +19,7 @@ from os.path import exists, expanduser, getmtime
 import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
+from dateutil import parser
 from pytz import timezone
 from tqdm import tqdm
 
@@ -52,6 +53,7 @@ def get_field_hockey_teams(season: int, level: str | int) -> pd.DataFrame:
     ```python
 
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a list of college field hockey teams
@@ -145,8 +147,8 @@ def get_field_hockey_teams(season: int, level: str | int) -> pd.DataFrame:
         return teams_df
 
     logging.warning(
-        f"Could not load {season} D{level} schools from cache, "
-        + "re-downloading that list of schools now."
+        f"Either we could not load {season} D{level} schools from cache, "
+        + "or it's time to refresh the cached data."
     )
     schools_df = _get_schools()
     url = (
@@ -307,6 +309,7 @@ def load_field_hockey_teams(start_year: int = 2009) -> pd.DataFrame:
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.field_hockey import load_field_hockey_teams
 
     # Compile a list of known field hockey teams
@@ -318,6 +321,7 @@ def load_field_hockey_teams(start_year: int = 2009) -> pd.DataFrame:
     df = load_field_hockey_teams()
     print(df)
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a list of
@@ -470,8 +474,6 @@ def get_field_hockey_team_schedule(team_id: int) -> pd.DataFrame:
         return games_df
 
     response = _get_webpage(url=url)
-    # with open("test.html", "w+") as f:
-    #     f.write(response.text)
     soup = BeautifulSoup(response.text, features="lxml")
 
     school_name = soup.find("div", {"class": "card"}).find("img").get("alt")
@@ -837,9 +839,339 @@ def get_field_hockey_team_schedule(team_id: int) -> pd.DataFrame:
     return games_df
 
 
-def get_field_hockey_day_schedule(game_date: str | date | datetime):
-    """ """
-    raise NotImplementedError("Its not ready.")
+def get_field_hockey_day_schedule(
+    game_date: str | date | datetime,
+    level: str | int = "I",
+):
+    """
+    Given a date and NCAA level,
+    this function retrieves field hockey every game for that date.
+
+    Parameters
+    ----------
+    `game_date` (int, mandatory):
+        Required argument.
+        Specifies the date you want a field hockey schedule from.
+        For best results, pass a string formatted as "YYYY-MM-DD".
+
+    `level` (int, mandatory):
+        Required argument.
+        Specifies the level/division you want a
+        NCAA field hockey schedule from.
+        This can either be an integer (1-3) or a string ("I"-"III").
+
+    Usage
+    ----------
+    ```python
+
+    from ncaa_stats_py.field_hockey import get_field_hockey_day_schedule
+
+
+    # Get all DI games that were played on November 24th, 2024.
+    print("Get all games that were played on November 24th, 2024.")
+    df = get_field_hockey_day_schedule("2024-11-24", level=1)
+    print(df)
+
+    # Get all division II games that were played on October 14th, 2024.
+    print("Get all division II games that were played on October 14th, 2024.")
+    df = get_field_hockey_day_schedule("2024-10-14", level="I")
+    print(df)
+
+    # Get all DI games that were played on September 7th, 2024.
+    print("Get all DI games that were played on September 7th, 2024.")
+    df = get_field_hockey_day_schedule("2024-09-07")
+    print(df)
+
+    # Get all DII games that were played on October 24th, 2023.
+    print("Get all games DII that were played on October 24th, 2023.")
+    df = get_field_hockey_day_schedule("2023-10-24", level="II")
+    print(df)
+
+    # Get all DII games played on September 14th, 2024.
+    print("Get all DII games played on September 14th, 2024.")
+    df = get_field_hockey_day_schedule("2023-01-14", level="III")
+    print(df)
+
+    ```
+
+    Returns
+    ----------
+    A pandas `DataFrame` object with all field hockey games played on that day,
+    for that NCAA division/level.
+
+    """
+
+    season = 0
+    sport_id = "WFH"
+
+    schedule_df = pd.DataFrame()
+    schedule_df_arr = []
+
+    if isinstance(game_date, date):
+        game_datetime = datetime.combine(
+            game_date, datetime.min.time()
+        )
+    elif isinstance(game_date, datetime):
+        game_datetime = game_date
+    elif isinstance(game_date, str):
+        game_datetime = parser.parse(
+            game_date
+        )
+    else:
+        unhandled_datatype = type(game_date)
+        raise ValueError(
+            f"Unhandled datatype for `game_date`: `{unhandled_datatype}`"
+        )
+
+    if isinstance(level, int) and level == 1:
+        formatted_level = "I"
+        ncaa_level = 1
+    elif isinstance(level, int) and level == 2:
+        formatted_level = "II"
+        ncaa_level = 2
+    elif isinstance(level, int) and level == 3:
+        formatted_level = "III"
+        ncaa_level = 3
+    elif isinstance(level, str) and (
+        level.lower() == "i" or level.lower() == "d1" or level.lower() == "1"
+    ):
+        ncaa_level = 1
+        formatted_level = level.upper()
+    elif isinstance(level, str) and (
+        level.lower() == "ii" or level.lower() == "d2" or level.lower() == "2"
+    ):
+        ncaa_level = 2
+        formatted_level = level.upper()
+    elif isinstance(level, str) and (
+        level.lower() == "iii" or level.lower() == "d3" or level.lower() == "3"
+    ):
+        ncaa_level = 3
+        formatted_level = level.upper()
+
+    del level
+
+    season = game_datetime.year
+    game_month = game_datetime.month
+    game_day = game_datetime.day
+    game_year = game_datetime.year
+
+    url = (
+        "https://stats.ncaa.org/contests/" +
+        f"livestream_scoreboards?utf8=%E2%9C%93&sport_code={sport_id}" +
+        f"&academic_year={season+1}&division={ncaa_level}" +
+        f"&game_date={game_month:00d}%2F{game_day:00d}%2F{game_year}" +
+        "&commit=Submit"
+    )
+
+    response = _get_webpage(url=url)
+    soup = BeautifulSoup(response.text, features="lxml")
+
+    game_boxes = soup.find_all("div", {"class": "table-responsive"})
+
+    for box in game_boxes:
+        game_id = None
+        game_alt_text = None
+        game_num = 1
+        # t_box = box.find("table")
+        table_box = box.find("table")
+        table_rows = table_box.find_all("tr")
+
+        # Date/attendance
+        game_date_str = table_rows[0].find("div", {"class": "col-6 p-0"}).text
+        game_date_str = game_date_str.replace("\n", "")
+        game_date_str = game_date_str.strip()
+        game_date_str = game_date_str.replace("TBA ", "TBA")
+        game_date_str = game_date_str.replace("TBD ", "TBD")
+        game_date_str = game_date_str.replace("PM ", "PM")
+        game_date_str = game_date_str.replace("AM ", "AM")
+        game_date_str = game_date_str.strip()
+        attendance_str = table_rows[0].find(
+            "div",
+            {"class": "col p-0 text-right"}
+        ).text
+
+        attendance_str = attendance_str.replace("Attend:", "")
+        attendance_str = attendance_str.replace(",", "")
+        attendance_str = attendance_str.replace("\n", "")
+        if (
+            "st" in attendance_str.lower() or
+            "nd" in attendance_str.lower() or
+            "rd" in attendance_str.lower() or
+            "th" in attendance_str.lower()
+        ):
+            # This is not an attendance,
+            # this is whatever quarter/half/inning this game is in.
+            attendance_num = None
+        elif "final" in attendance_str.lower():
+            attendance_num = None
+        elif len(attendance_str) > 0:
+            attendance_num = int(attendance_str)
+        else:
+            attendance_num = None
+
+        if "(" in game_date_str:
+            game_date_str = game_date_str.replace(")", "")
+            game_date_str, game_num = game_date_str.split("(")
+            game_num = int(game_num)
+
+        if "TBA" in game_date_str:
+            game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y TBA')
+        elif "tba" in game_date_str:
+            game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y tba')
+        elif "TBD" in game_date_str:
+            game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y TBD')
+        elif "tbd" in game_date_str:
+            game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y tbd')
+        elif (
+            "tbd" not in game_date_str.lower() and
+            ":" not in game_date_str.lower()
+        ):
+            game_date_str = game_date_str.replace(" ", "")
+            game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y')
+        else:
+            game_datetime = datetime.strptime(
+                game_date_str,
+                '%m/%d/%Y %I:%M %p'
+            )
+        game_datetime = game_datetime.astimezone(timezone("US/Eastern"))
+
+        game_alt_text = table_rows[1].find_all("td")[0].text
+        if game_alt_text is not None and len(game_alt_text) > 0:
+            game_alt_text = game_alt_text.replace("\n", "")
+            game_alt_text = game_alt_text.strip()
+
+        if len(game_alt_text) == 0:
+            game_alt_text = None
+
+        urls_arr = box.find_all("a")
+
+        for u in urls_arr:
+            url_temp = u.get("href")
+            if "contests" in url_temp:
+                game_id = url_temp
+                del url_temp
+
+        if game_id is None:
+            for r in range(0, len(table_rows)):
+                temp = table_rows[r]
+                temp_id = temp.get("id")
+
+                if temp_id is not None and len(temp_id) > 0:
+                    game_id = temp_id
+
+        del urls_arr
+
+        game_id = game_id.replace("/contests", "")
+        game_id = game_id.replace("/box_score", "")
+        game_id = game_id.replace("/livestream_scoreboards", "")
+        game_id = game_id.replace("/", "")
+        game_id = game_id.replace("contest_", "")
+        game_id = int(game_id)
+
+        table_rows = table_box.find_all("tr", {"id": f"contest_{game_id}"})
+        away_team_row = table_rows[0]
+        home_team_row = table_rows[1]
+
+        # Away team
+        td_arr = away_team_row.find_all("td")
+
+        if "Canceled" in td_arr[5].text:
+            continue
+
+        try:
+            away_team_name = td_arr[0].find("img").get("alt")
+        except Exception:
+            away_team_name = td_arr[1].text
+        away_team_name = away_team_name.replace("\n", "")
+        away_team_name = away_team_name.strip()
+
+        try:
+            away_team_id = td_arr[1].find("a").get("href")
+            away_team_id = away_team_id.replace("/teams/", "")
+            away_team_id = int(away_team_id)
+        except AttributeError:
+            away_team_id = None
+            logging.info("No team ID found for the away team")
+        except Exception as e:
+            raise e
+
+        away_goals_scored = td_arr[-1].text
+        away_goals_scored = away_goals_scored.replace("\n", "")
+        away_goals_scored = away_goals_scored.replace("\xa0", "")
+        if "canceled" in away_goals_scored.lower():
+            continue
+        elif "ppd" in away_goals_scored.lower():
+            continue
+        if len(away_goals_scored) > 0:
+            away_goals_scored = int(away_goals_scored)
+        else:
+            away_goals_scored = 0
+
+        del td_arr
+
+        # Home team
+        td_arr = home_team_row.find_all("td")
+
+        try:
+            home_team_name = td_arr[0].find("img").get("alt")
+        except Exception:
+            home_team_name = td_arr[1].text
+        home_team_name = home_team_name.replace("\n", "")
+        home_team_name = home_team_name.strip()
+
+        try:
+            home_team_id = td_arr[1].find("a").get("href")
+            home_team_id = home_team_id.replace("/teams/", "")
+            home_team_id = int(home_team_id)
+        except AttributeError:
+            home_team_id = None
+            logging.info("No team ID found for the home team")
+        except Exception as e:
+            raise e
+
+        home_goals_scored = td_arr[-1].text
+        home_goals_scored = home_goals_scored.replace("\n", "")
+        if len(home_goals_scored) > 0:
+            home_goals_scored = int(home_goals_scored)
+        else:
+            home_goals_scored = 0
+
+        temp_df = pd.DataFrame(
+            {
+                "season": season,
+                "sport_id": sport_id,
+                "game_date": game_datetime.strftime("%Y-%m-%d"),
+                "game_datetime": game_datetime.isoformat(),
+                "game_id": game_id,
+                "formatted_level": formatted_level,
+                "ncaa_level": ncaa_level,
+                "game_alt_text": game_alt_text,
+                "away_team_id": away_team_id,
+                "away_team_name": away_team_name,
+                "home_team_id": home_team_id,
+                "home_team_name": home_team_name,
+                "home_goals_scored": home_goals_scored,
+                "away_goals_scored": away_goals_scored,
+                "attendance": attendance_num
+            },
+            index=[0]
+        )
+        schedule_df_arr.append(temp_df)
+
+        del temp_df
+
+    if len(schedule_df_arr) >= 1:
+        schedule_df = pd.concat(schedule_df_arr, ignore_index=True)
+    else:
+        logging.warning(
+            "Could not find any game(s) for "
+            + f"{game_datetime.year:00d}-{game_datetime.month:00d}"
+            + f"-{game_datetime.day:00d}. "
+            + "If you believe this is an error, "
+            + "please raise an issue at "
+            + "\n https://github.com/armstjc/ncaa_stats_py/issues \n"
+        )
+    return schedule_df
 
 
 def get_full_field_hockey_schedule(
@@ -866,6 +1198,7 @@ def get_full_field_hockey_schedule(
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.field_hockey import get_full_field_hockey_schedule
 
     # Get the entire 2024 schedule for the 2024 D1 field hockey season.
@@ -1013,6 +1346,7 @@ def get_field_hockey_team_roster(team_id: int) -> pd.DataFrame:
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.field_hockey import get_field_hockey_team_roster
 
     # Get the roster of the 2024 Quinnipac field hockey team (D1, ID: 586482).
@@ -1039,7 +1373,9 @@ def get_field_hockey_team_roster(team_id: int) -> pd.DataFrame:
     )
     df = get_field_hockey_team_roster(team_id=539551)
     print(df)
+
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with
@@ -1053,6 +1389,31 @@ def get_field_hockey_team_roster(team_id: int) -> pd.DataFrame:
     load_from_cache = True
     home_dir = expanduser("~")
     home_dir = _format_folder_str(home_dir)
+
+    stat_columns = [
+        "season",
+        "season_name",
+        "sport_id",
+        "ncaa_division",
+        "ncaa_division_formatted",
+        "team_conference_name",
+        "school_id",
+        "school_name",
+        "player_id",
+        "player_jersey_num",
+        "player_full_name",
+        "player_first_name",
+        "player_last_name",
+        "player_class",
+        "player_positions",
+        "player_height_string",
+        "player_weight",
+        "player_hometown",
+        "player_high_school",
+        "player_G",
+        "player_GS",
+        "player_url",
+    ]
 
     team_df = load_field_hockey_teams()
 
@@ -1111,8 +1472,6 @@ def get_field_hockey_team_roster(team_id: int) -> pd.DataFrame:
         return teams_df
 
     response = _get_webpage(url=url)
-    with open("test.html", "w+") as f:
-        f.write(response.text)
     soup = BeautifulSoup(response.text, features="lxml")
     try:
         school_name = soup.find("div", {"class": "card"}).find("img").get(
@@ -1186,6 +1545,37 @@ def get_field_hockey_team_roster(team_id: int) -> pd.DataFrame:
     roster_df["school_id"] = school_id
     roster_df["school_name"] = school_name
     roster_df["sport_id"] = sport_id
+
+    roster_df.rename(
+        columns={
+            "GP": "player_G",
+            "GS": "player_GS",
+            "#": "player_jersey_num",
+            "Name": "player_full_name",
+            "Class": "player_class",
+            "Position": "player_positions",
+            "Height": "player_height_string",
+            "Hometown": "player_hometown",
+            "High School": "player_high_school",
+        },
+        inplace=True
+    )
+
+    roster_df[["player_first_name", "player_last_name"]] = roster_df[
+        "player_full_name"
+    ].str.split(" ", n=1, expand=True)
+    roster_df = roster_df.infer_objects().replace(r'^\s*$', np.nan, regex=True)
+
+    for i in roster_df.columns:
+        if i in stat_columns:
+            pass
+        else:
+            raise ValueError(
+                f"Unhandled column name {i}"
+            )
+
+    roster_df = roster_df.infer_objects().reindex(columns=stat_columns)
+
     roster_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/field_hockey/rosters/" +
         f"{team_id}_roster.csv",
@@ -1212,6 +1602,7 @@ def get_field_hockey_player_season_stats(
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.field_hockey import get_field_hockey_player_season_stats
 
     # Get the season stats of the
@@ -1242,6 +1633,7 @@ def get_field_hockey_player_season_stats(
     df = get_field_hockey_player_season_stats(team_id=539344)
     print(df)
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with the season stats for
@@ -1256,6 +1648,46 @@ def get_field_hockey_player_season_stats(
     stats_df = pd.DataFrame()
     # stats_df_arr = []
     temp_df = pd.DataFrame()
+
+    stat_columns = [
+        "season",
+        "season_name",
+        "sport_id",
+        "team_id",
+        "team_conference_name",
+        "school_id",
+        "school_name",
+        "ncaa_division",
+        "ncaa_division_formatted",
+
+        "player_id",
+        "player_jersey_number",
+        "player_last_name",
+        "player_first_name",
+        "player_full_name",
+        "player_class",
+        "player_positions",
+        "player_GP",
+        "player_GS",
+
+        "player_G",
+        "player_AST",
+        "player_PTS",
+        "player_SH",
+        "player_Fouls",
+        "player_RC",
+        "player_YC",
+        "player_GC",
+        "player_DSV",
+
+        "goalie_GP",
+        "goalie_GS",
+        "goalie_minutes_played",
+        "goalie_seconds_played",
+        "goalie_GA",
+        "goalie_GAA",
+        "goalie_SV",
+    ]
 
     team_df = load_field_hockey_teams()
 
@@ -1336,6 +1768,7 @@ def get_field_hockey_player_season_stats(
     if load_from_cache is True:
         return games_df
 
+    # Parse both normal and goalie game data
     for url in [players_url, gk_url]:
         stat_type_str = ""
         if str(players_stat_id) in url:
@@ -1344,8 +1777,6 @@ def get_field_hockey_player_season_stats(
             stat_type_str = "goalkeepers"
 
         response = _get_webpage(url=url)
-        # with open("test.html", "w+") as f:
-        #     f.write(response.text)
         soup = BeautifulSoup(response.text, features="lxml")
 
         season_name = (
@@ -1447,7 +1878,8 @@ def get_field_hockey_player_season_stats(
 
     players_df = pd.concat(players_df_arr, ignore_index=True)
     players_df = players_df.replace("", None)
-    players_df = players_df.fillna(0)
+    players_df = players_df.infer_objects().fillna(0)
+
     players_df.rename(
         columns={
             "#": "player_jersey_number",
@@ -1490,11 +1922,19 @@ def get_field_hockey_player_season_stats(
     stats_df["ncaa_division"] = ncaa_division
     stats_df["ncaa_division_formatted"] = ncaa_division_formatted
     stats_df["team_conference_name"] = team_conference_name
+    stats_df["team_id"] = team_id
     stats_df["sport_id"] = sport_id
 
-    stats_df = stats_df.infer_objects()
+    for i in stats_df.columns:
+        if i in stat_columns:
+            pass
+        else:
+            raise ValueError(
+                f"Unhandled column name {i}"
+            )
 
-    stats_df = stats_df.infer_objects()
+    stats_df = stats_df.infer_objects().reindex(columns=stat_columns)
+
     stats_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/field_hockey/"
         + "player_season_stats/"
@@ -1560,6 +2000,7 @@ def get_field_hockey_player_game_stats(
     print(df)
 
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a player's batting game logs
@@ -1862,6 +2303,7 @@ def get_field_hockey_game_player_stats(game_id: int) -> pd.DataFrame:
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.field_hockey import (
         get_field_hockey_game_player_stats
     )
@@ -1912,6 +2354,7 @@ def get_field_hockey_game_player_stats(game_id: int) -> pd.DataFrame:
     )
     print(df)
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a player game stats in a given game.
@@ -2232,6 +2675,7 @@ def get_field_hockey_game_team_stats(game_id: int) -> pd.DataFrame:
     Usage
     ----------
     ```python
+
     from ncaa_stats_py.field_hockey import (
         get_field_hockey_game_team_stats
     )
@@ -2282,6 +2726,7 @@ def get_field_hockey_game_team_stats(game_id: int) -> pd.DataFrame:
     )
     print(df)
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with team game stats in a given game.
@@ -2403,6 +2848,7 @@ def get_field_hockey_raw_pbp(game_id: int) -> pd.DataFrame:
     print(df)
 
     ```
+
     Returns
     ----------
     A pandas `DataFrame` object with a play-by-play (PBP) data in a given game.
