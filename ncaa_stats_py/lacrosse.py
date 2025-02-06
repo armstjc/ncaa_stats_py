@@ -7,6 +7,8 @@
 # - 2024-12-18 02:18 PM EST
 # - 2025-01-04 03:00 PM EDT
 # - 2025-01-18 02:40 PM EDT
+# - 2025-02-01 02:40 PM EDT
+# - 2025-02-05 08:50 PM EDT
 
 
 import logging
@@ -219,7 +221,7 @@ def get_lacrosse_teams(
 
     age = now - file_mod_datetime
 
-    if age.days >= 14 and season >= (now.year - 1) and now.month <= 7:
+    if age.days >= 14 and season >= (now.year - 1):
         load_from_cache = False
 
     if load_from_cache is True:
@@ -2378,7 +2380,11 @@ def get_lacrosse_player_season_stats(
             if p_sortable == "-":
                 continue
 
-            p_last, p_first = p_sortable.split(",")
+            if len(p_sortable) == 2:
+                p_last, p_first = p_sortable.split(",")
+            elif len(p_sortable) == 3:
+                p_last, temp_name, p_first = p_sortable.split(",")
+                p_last = f"{p_last} {temp_name}"
 
             t_cells = [x.text.strip() for x in t_cells]
 
