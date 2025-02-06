@@ -8,6 +8,8 @@
 # - 2024-12-17 10:30 AM EDT
 # - 2025-01-04 03:00 PM EDT
 # - 2025-01-18 02:40 PM EDT
+# - 2025-02-01 02:40 PM EDT
+# - 2025-02-05 08:50 PM EDT
 
 
 import logging
@@ -1976,7 +1978,11 @@ def get_softball_player_season_batting_stats(
         p_first = ""
         t_cells = t.find_all("td")
         p_sortable = t_cells[1].get("data-order")
-        p_last, p_first = p_sortable.split(",")
+        if len(p_sortable) == 2:
+            p_last, p_first = p_sortable.split(",")
+        elif len(p_sortable) == 3:
+            p_last, temp_name, p_first = p_sortable.split(",")
+            p_last = f"{p_last} {temp_name}"
 
         t_cells = [x.text.strip() for x in t_cells]
 
@@ -2375,7 +2381,11 @@ def get_softball_player_season_pitching_stats(
         p_first = ""
         t_cells = t.find_all("td")
         p_sortable = t_cells[1].get("data-order")
-        p_last, p_first = p_sortable.split(",")
+        if len(p_sortable) == 2:
+            p_last, p_first = p_sortable.split(",")
+        elif len(p_sortable) == 3:
+            p_last, temp_name, p_first = p_sortable.split(",")
+            p_last = f"{p_last} {temp_name}"
 
         t_cells = [x.text.strip() for x in t_cells]
 
@@ -2745,7 +2755,11 @@ def get_softball_player_season_fielding_stats(
         p_first = ""
         t_cells = t.find_all("td")
         p_sortable = t_cells[1].get("data-order")
-        p_last, p_first = p_sortable.split(",")
+        if len(p_sortable) == 2:
+            p_last, p_first = p_sortable.split(",")
+        elif len(p_sortable) == 3:
+            p_last, temp_name, p_first = p_sortable.split(",")
+            p_last = f"{p_last} {temp_name}"
 
         t_cells = [x.text.strip() for x in t_cells]
 
@@ -3050,7 +3064,6 @@ def get_softball_player_game_batting_stats(
     # del team_df
     response = _get_webpage(url=url)
     soup = BeautifulSoup(response.text, features="lxml")
-
 
     table_data = soup.find_all(
         "table", {"class": "small_font dataTable table-bordered"}

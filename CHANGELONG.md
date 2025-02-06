@@ -1,5 +1,23 @@
 # `ncaa_stats_py` Changelog
 
+## 0.0.10: The "Football" update
+
+## 0.0.9: The "Emergency Fix #1" update
+- Pushed an emergency fix that would cause the package to catastrophically fail to parse a player's name that is formatted as `{last name}, {suffix}, {first name}`.
+- Fixed a bug where `ncaa_stats_py.field_hockey.get_field_hockey_team_schedule()` would generate the incorrect URL for a player.
+- Fixed a bug where `ncaa_stats_py.volleyball.get_volleyball_team_schedule()` would generate the incorrect URL for a player.
+- Fixed a bug where `ncaa_stats_py.baseball.get_baseball_team_schedule()` would generate the incorrect URL for a player.
+- Implemented `ncaa_stats_py.football.get_football_teams()`, a function that allows you to get a list of NCAA football teams for a season and level.
+- Implemented `ncaa_stats_py.football.load_football_teams()`, a function that builds on top of `ncaa_stats_py.football.get_football_teams()`, and retrieves a list of all possible football teams from 2008 to present day.
+- Implemented `ncaa_stats_py.football.get_football_team_schedule()`, a function that allows you to get a schedule for a specific football team.
+- Implemented `ncaa_stats_py.football.get_football_day_schedule()`, a function that allows you to get a football schedule for a specific date, and NCAA level.
+- Implemented `ncaa_stats_py.football.get_full_football_schedule()`, a function that builds on top of `ncaa_stats_py.football.get_football_team_schedule()` and allows you to get the entire football schedule for a given season and level.
+- Implemented `ncaa_stats_py.football.get_football_team_roster()`, a function that allows one to get a full team roster from a given team ID.
+
+**NOTE**: Other football functions are indeed present, but are not fully implemented and will raise a `NotImplementedError` exception.
+
+- Set the package version to `0.0.9`.
+
 ## 0.0.8: The "Convenience" update
 - Fixed a bug in `ncaa_stats_py.lacrosse.load_lacrosse_teams()` that would cause the function to crash in certain conditions before games would be played in a calendar year.
 - For the following functions, `[player_first_name]` and `[player_last_name]` are now added as columns within the returned `pandas` `DataFrame`:

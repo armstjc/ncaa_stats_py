@@ -6,6 +6,9 @@
 # - 2024-09-20 08:15 PM EDT
 # - 2025-01-04 03:00 PM EDT
 # - 2025-01-18 02:44 PM EDT
+# - 2025-02-01 02:40 PM EDT
+# - 2025-02-05 08:50 PM EDT
+
 
 import logging
 import re
@@ -961,11 +964,13 @@ def get_volleyball_team_schedule(team_id: int) -> pd.DataFrame:
 
             try:
                 game_id = cells[2].find("a").get("href")
-                game_url = f"https://stats.ncaa.org{game_id}/box_score"
                 game_id = game_id.replace("/contests", "")
                 game_id = game_id.replace("/box_score", "")
                 game_id = game_id.replace("/", "")
                 game_id = int(game_id)
+                game_url = (
+                    f"https://stats.ncaa.org/contests/{game_id}/box_score"
+                )
             except AttributeError as e:
                 logging.info(
                     "Could not parse a game ID for this game. "
@@ -2431,7 +2436,11 @@ def get_volleyball_player_season_stats(
         if "team" in t_cells[1].text.lower():
             continue
         p_sortable = t_cells[1].get("data-order")
-        p_last, p_first = p_sortable.split(",")
+        if len(p_sortable) == 2:
+            p_last, p_first = p_sortable.split(",")
+        elif len(p_sortable) == 3:
+            p_last, temp_name, p_first = p_sortable.split(",")
+            p_last = f"{p_last} {temp_name}"
 
         t_cells = [x.text.strip() for x in t_cells]
         t_cells = [x.replace(",", "") for x in t_cells]

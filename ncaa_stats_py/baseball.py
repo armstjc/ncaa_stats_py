@@ -11,6 +11,8 @@
 # - 2024-12-17 10:30 AM EDT
 # - 2025-01-04 03:00 PM EDT
 # - 2025-01-18 02:40 PM EDT
+# - 2025-02-01 02:40 PM EDT
+# - 2025-02-05 08:50 PM EDT
 
 
 import logging
@@ -684,11 +686,13 @@ def get_baseball_team_schedule(team_id: int) -> pd.DataFrame:
 
             try:
                 game_id = cells[2].find("a").get("href")
-                game_url = f"https://stats.ncaa.org{game_id}/box_score"
                 game_id = game_id.replace("/contests", "")
                 game_id = game_id.replace("/box_score", "")
                 game_id = game_id.replace("/", "")
                 game_id = int(game_id)
+                game_url = (
+                    f"https://stats.ncaa.org/contests/{game_id}/box_score"
+                )
 
             except AttributeError as e:
                 logging.info(
@@ -1890,8 +1894,12 @@ def get_baseball_player_season_batting_stats(
         p_first = ""
         t_cells = t.find_all("td")
         p_sortable = t_cells[1].get("data-order")
-        p_last, p_first = p_sortable.split(",")
 
+        if len(p_sortable) == 2:
+            p_last, p_first = p_sortable.split(",")
+        elif len(p_sortable) == 3:
+            p_last, temp_name, p_first = p_sortable.split(",")
+            p_last = f"{p_last} {temp_name}"
         t_cells = [x.text.strip() for x in t_cells]
 
         temp_df = pd.DataFrame(
@@ -2243,7 +2251,11 @@ def get_baseball_player_season_pitching_stats(
         p_first = ""
         t_cells = t.find_all("td")
         p_sortable = t_cells[1].get("data-order")
-        p_last, p_first = p_sortable.split(",")
+        if len(p_sortable) == 2:
+            p_last, p_first = p_sortable.split(",")
+        elif len(p_sortable) == 3:
+            p_last, temp_name, p_first = p_sortable.split(",")
+            p_last = f"{p_last} {temp_name}"
 
         t_cells = [x.text.strip() for x in t_cells]
 
@@ -2602,7 +2614,11 @@ def get_baseball_player_season_fielding_stats(
         p_first = ""
         t_cells = t.find_all("td")
         p_sortable = t_cells[1].get("data-order")
-        p_last, p_first = p_sortable.split(",")
+        if len(p_sortable) == 2:
+            p_last, p_first = p_sortable.split(",")
+        elif len(p_sortable) == 3:
+            p_last, temp_name, p_first = p_sortable.split(",")
+            p_last = f"{p_last} {temp_name}"
 
         t_cells = [x.text.strip() for x in t_cells]
 
@@ -2879,29 +2895,12 @@ def get_baseball_player_game_batting_stats(
     if load_from_cache is True:
         return games_df
 
-    # team_df = load_baseball_teams()
-
-    # team_df = team_df[team_df["team_id"] == team_id]
-
-    # season = team_df["season"].iloc[0]
-    # ncaa_division = team_df["ncaa_division"].iloc[0]
-    # ncaa_division_formatted = team_df["ncaa_division_formatted"].iloc[0]
-    # team_conference_name = team_df["team_conference_name"].iloc[0]
-    # school_name = team_df["school_name"].iloc[0]
-    # school_id = int(team_df["school_id"].iloc[0])
-
-    # del team_df
     response = _get_webpage(url=url)
     soup = BeautifulSoup(response.text, features="lxml")
-
 
     table_data = soup.find_all(
         "table", {"class": "small_font dataTable table-bordered"}
     )[1]
-    # table_data = table_data.find(
-    #     "table",
-    #     {"class": "small_font dataTable table-bordered"}
-    # )
 
     temp_table_headers = table_data.find("thead").find("tr").find_all("th")
     table_headers = [x.text for x in temp_table_headers]
