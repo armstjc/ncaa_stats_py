@@ -4219,8 +4219,21 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
         t_header_str = t_header.text
         team_id = t_header.find("a").get("href")
         team_id = team_id.replace("/teams", "")
+        team_id = team_id.replace(
+            "javascript:togglePeriodStats(competitor_",
+            ""
+        )
+        if "_year" in team_id:
+            team_id = team_id.split("_year")[0]
         team_id = team_id.replace("/", "")
-        team_id = int(team_id)
+
+        try:
+            team_id = int(team_id)
+        except Exception as e:
+            team_id = -1
+            logging.warning(
+                f"Unhandled exception: `{e}`"
+            )
 
         table_data = box.find(
             "table",
@@ -4255,8 +4268,13 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
             if "\xa0" in p_name:
                 game_started = 0
             t_cells = [x.text.strip() for x in t_cells]
-            player_id = int(player_id)
-
+            try:
+                player_id = int(player_id)
+            except Exception:
+                logging.info(
+                    "Could not find a player ID, skipping this row."
+                )
+                continue
             temp_df = pd.DataFrame(
                 data=[t_cells],
                 columns=table_headers
@@ -4844,8 +4862,17 @@ def get_raw_baseball_game_pbp(game_id: int):
         game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y TBD')
     elif "tbd" in game_date_str:
         game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y tbd')
+    elif (
+        "tbd" not in game_date_str.lower() and
+        ":" not in game_date_str.lower()
+    ):
+        game_date_str = game_date_str.replace(" ", "")
+        game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y')
     else:
-        game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y %I:%M %p')
+        game_datetime = datetime.strptime(
+            game_date_str,
+            '%m/%d/%Y %I:%M %p'
+        )
     game_datetime = game_datetime.astimezone(timezone("US/Eastern"))
     game_date_str = game_datetime.isoformat()
     del game_datetime

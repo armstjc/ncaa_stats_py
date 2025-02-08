@@ -2630,7 +2630,9 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
             score_str = drive_header_box[d].find(
                 "div", {"class": "headerRight"}
             ).text
-
+            away_score, home_score = score_str.split("-")
+            away_score = int(away_score)
+            home_score = int(home_score)
             temp_plays_arr = drive_plays_arr[dp_pointer].find_all(
                 "div", {"style": "border-bottom: 1px dotted #dcdddf;"}
             )
@@ -2690,14 +2692,27 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
 
                 temp_df = pd.DataFrame(
                     {
-                        
+                        "drive_num": drive_num,
+                        "possession_team_id": possession_team,
+                        "defensive_team": defensive_team,
+                        "posteam_type": posteam_type,
+                        "quarter_num": quarter_num,
+                        "score_str": score_str,
+                        "away_score": away_score,
+                        "home_score": home_score,
+                        "play_text": play_text,
+                        "down": down,
+                        "distance": distance,
+                        "yrdln": yrdln,
+                        "is_overtime": is_overtime,
+                        "quarter_seconds_remaining": quarter_seconds_remaining,
+                        "half_seconds_remaining": half_seconds_remaining,
+                        "game_seconds_remaining": game_seconds_remaining,
                     },
                     index=[0]
                 )
+                pbp_df_arr.append(temp_df)
 
-    raise NotImplementedError(
-        "It's in progress, but raw PBP data isn't ready yet."
-    )
     pbp_df = pd.concat(pbp_df_arr, ignore_index=True)
     pbp_df["event_num"] = pbp_df.index + 1
     pbp_df["game_datetime"] = game_date_str

@@ -1,6 +1,10 @@
 # `ncaa_stats_py` Changelog
 
 ## 0.0.10: The "Football" update
+- Fixed a bug in `ncaa_stats_py.baseball.get_raw_baseball_game_pbp()` where the function would crash if a game only had a date, and not a date and time.
+- Fixed a bug in `ncaa_stats_py.baseball.get_baseball_game_player_stats()` where footer rows for stat tables would be accidentally parsed as if it's a player, causing a crash to happen.
+- Fixed a bug where team IDs would not be identified correctly in `ncaa_stats_py.baseball.get_baseball_game_player_stats()` through standard means.
+- Set the package version to `0.0.10`.
 
 ## 0.0.9: The "Emergency Fix #1" update
 - Pushed an emergency fix that would cause the package to catastrophically fail to parse a player's name that is formatted as `{last name}, {suffix}, {first name}`.

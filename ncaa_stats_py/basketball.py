@@ -3945,8 +3945,17 @@ def get_basketball_raw_pbp(game_id: int) -> pd.DataFrame:
         game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y TBD')
     elif "tbd" in game_date_str:
         game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y tbd')
+    elif (
+        "tbd" not in game_date_str.lower() and
+        ":" not in game_date_str.lower()
+    ):
+        game_date_str = game_date_str.replace(" ", "")
+        game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y')
     else:
-        game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y %I:%M %p')
+        game_datetime = datetime.strptime(
+            game_date_str,
+            '%m/%d/%Y %I:%M %p'
+        )
     game_datetime = game_datetime.astimezone(timezone("US/Eastern"))
     game_date_str = game_datetime.isoformat()
     del game_datetime
