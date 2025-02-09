@@ -168,10 +168,18 @@ def get_softball_teams(season: int, level: str | int) -> pd.DataFrame:
     age = now - file_mod_datetime
 
     if (
+        age.days >= 1 and
+        season >= now.year and
+        now.month <= 7
+    ):
+        load_from_cache = False
+    elif (
         age.days >= 14 and
         season >= (now.year - 1) and
         now.month <= 7
     ):
+        load_from_cache = False
+    elif age.days >= 35:
         load_from_cache = False
 
     if load_from_cache is True:

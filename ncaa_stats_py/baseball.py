@@ -171,10 +171,18 @@ def get_baseball_teams(season: int, level: str | int) -> pd.DataFrame:
     age = now - file_mod_datetime
 
     if (
+        age.days >= 1 and
+        season >= now.year and
+        now.month <= 7
+    ):
+        load_from_cache = False
+    elif (
         age.days >= 14 and
         season >= (now.year - 1) and
         now.month <= 7
     ):
+        load_from_cache = False
+    elif age.days >= 35:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -1113,7 +1121,9 @@ def get_baseball_day_schedule(
         # Away team
         td_arr = away_team_row.find_all("td")
 
-        if "Canceled" in td_arr[5].text:
+        if "canceled" in td_arr[5].text.lower():
+            continue
+        elif "ppd" in td_arr[5].text.lower():
             continue
 
         try:
@@ -1853,13 +1863,6 @@ def get_baseball_player_season_batting_stats(
 
     response = _get_webpage(url=url)
     soup = BeautifulSoup(response.text, features="lxml")
-    # try:
-    #     school_name = soup.find(
-    #         "div", {"class": "card"}
-    #     ).find("img").get("alt")
-    # except Exception:
-    #     school_name = soup.find("div", {"class": "card"}).find("a").text
-    #     school_name = school_name.rsplit(" ", maxsplit=1)[0]
 
     season_name = (
         soup.find("select", {"id": "year_list"})

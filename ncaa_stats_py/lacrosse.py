@@ -221,7 +221,19 @@ def get_lacrosse_teams(
 
     age = now - file_mod_datetime
 
-    if age.days >= 14 and season >= (now.year - 1):
+    if (
+        age.days >= 1 and
+        season >= now.year and
+        now.month <= 7
+    ):
+        load_from_cache = False
+    elif (
+        age.days >= 14 and
+        season >= (now.year - 1) and
+        now.month <= 7
+    ):
+        load_from_cache = False
+    elif age.days >= 35:
         load_from_cache = False
 
     if load_from_cache is True:

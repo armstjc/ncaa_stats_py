@@ -1,6 +1,9 @@
 # `ncaa_stats_py` Changelog
 
 ## 0.0.10: The "Football" update
+- Implemented `ncaa_stats_py.football.get_football_raw_pbp()`, to parse raw play-by-play data, and normalize the data into something that can be parsed at a later date.
+- Fixed the logic in getting team information to update the information within a season more often to avoid potential data issues during the season.
+- Fixed a bug where `ncaa_stats_py.baseball.get_baseball_day_schedule()` would crash and burn if games were marked as "postponed" in a specific way.
 - Fixed a bug in `ncaa_stats_py.baseball.get_raw_baseball_game_pbp()` where the function would crash if a game only had a date, and not a date and time.
 - Fixed a bug in `ncaa_stats_py.baseball.get_baseball_game_player_stats()` where footer rows for stat tables would be accidentally parsed as if it's a player, causing a crash to happen.
 - Fixed a bug where team IDs would not be identified correctly in `ncaa_stats_py.baseball.get_baseball_game_player_stats()` through standard means.
