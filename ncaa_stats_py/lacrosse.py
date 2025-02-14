@@ -490,13 +490,15 @@ def load_lacrosse_teams(
             continue
 
         for d in ncaa_divisions:
-            temp_df = get_lacrosse_teams(
-                season=s,
-                level=d,
-                get_womens_lacrosse_data=get_womens_lacrosse_data
-            )
-            teams_df_arr.append(temp_df)
-            del temp_df
+            try:
+                temp_df = get_lacrosse_teams(season=s, level=d)
+                teams_df_arr.append(temp_df)
+                del temp_df
+            except Exception as e:
+                logging.warning(
+                    "Unhandled exception when trying to " +
+                    f"get the teams. Full exception: `{e}`"
+                )
 
     teams_df = pd.concat(teams_df_arr, ignore_index=True)
     teams_df = teams_df.infer_objects()

@@ -590,9 +590,15 @@ def load_football_teams(start_year: int = 2013) -> pd.DataFrame:
     for s in ncaa_seasons:
         logging.info(f"Loading in football teams for the {s} season.")
         for d in ncaa_divisions:
-            temp_df = get_football_teams(season=s, level=d)
-            teams_df_arr.append(temp_df)
-            del temp_df
+            try:
+                temp_df = get_football_teams(season=s, level=d)
+                teams_df_arr.append(temp_df)
+                del temp_df
+            except Exception as e:
+                logging.warning(
+                    "Unhandled exception when trying to " +
+                    f"get the teams. Full exception: `{e}`"
+                )
 
     teams_df = pd.concat(teams_df_arr, ignore_index=True)
     return teams_df

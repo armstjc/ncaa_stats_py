@@ -1,6 +1,7 @@
 # `ncaa_stats_py` Changelog
 
 ## 0.0.10: The "Football" update
+- Fixed a logic issue that could happen if a sport's season hasn't started yet for a division for a sport, causing the process to get team information to crash and burn.
 - Implemented `ncaa_stats_py.football.get_football_raw_pbp()`, to parse raw play-by-play data, and normalize the data into something that can be parsed at a later date.
 - Fixed the logic in getting team information to update the information within a season more often to avoid potential data issues during the season.
 - Fixed a bug where `ncaa_stats_py.baseball.get_baseball_day_schedule()` would crash and burn if games were marked as "postponed" in a specific way.
