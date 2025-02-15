@@ -209,16 +209,9 @@ def get_baseball_teams(season: int, level: str | int) -> pd.DataFrame:
 
     while found_value is False:
         for rp in ranking_periods:
-            if "final " in rp.text.lower():
-                rp_value = rp.get("value")
-                found_value = True
-                break
-            elif "-" in rp.text:
-                pass
-            else:
-                rp_value = rp.get("value")
-                found_value = True
-                break
+            rp_value = rp.get("value")
+            found_value = True
+            break
 
     url = (
         "https://stats.ncaa.org/rankings/institution_trends?"
