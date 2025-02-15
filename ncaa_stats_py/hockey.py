@@ -215,7 +215,13 @@ def get_hockey_teams(
 
     age = now - file_mod_datetime
 
-    if age.days >= 14 and season >= (now.year - 1):
+    if (
+        age.days >= 1 and
+        season >= (now.year - 1) and
+        now.month <= 7
+    ):
+        load_from_cache = False
+    elif age.days >= 35:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -452,13 +458,15 @@ def load_hockey_teams(
     for s in ncaa_seasons:
         logging.info(f"Loading in hockey teams for the {s} season.")
         for d in ncaa_divisions:
-            temp_df = get_hockey_teams(
-                season=s,
-                level=d,
-                get_womens_hockey_data=get_womens_hockey_data
-            )
-            teams_df_arr.append(temp_df)
-            del temp_df
+            try:
+                temp_df = get_hockey_teams(season=s, level=d)
+                teams_df_arr.append(temp_df)
+                del temp_df
+            except Exception as e:
+                logging.warning(
+                    "Unhandled exception when trying to " +
+                    f"get the teams. Full exception: `{e}`"
+                )
 
     teams_df = pd.concat(teams_df_arr, ignore_index=True)
     teams_df = teams_df.infer_objects()

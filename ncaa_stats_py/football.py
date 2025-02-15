@@ -24,7 +24,6 @@ from ncaa_stats_py.utls import (
     _format_folder_str,
     _get_schools,
     _get_seconds_from_time_str,
-    _get_stat_id,
     _get_webpage,
 )
 
@@ -204,11 +203,18 @@ def get_football_teams(season: int, level: str | int) -> pd.DataFrame:
 
     age = now - file_mod_datetime
 
-    if age.days >= 14 and season >= (now.year - 1):
+    if (
+        age.days >= 11 and
+        season >= (now.year - 1) and
+        now.month <= 7
+    ):
+        load_from_cache = False
+    elif age.days >= 35:
         load_from_cache = False
 
     if load_from_cache is True:
         return teams_df
+
 
     try:
         team_ids_df.read_csv(
@@ -378,6 +384,8 @@ def get_football_teams(season: int, level: str | int) -> pd.DataFrame:
             del temp_df
 
     teams_df = pd.concat(teams_df_arr, ignore_index=True)
+
+    # Fixing team names for the merger.
     teams_df["school_name"] = teams_df["school_name"].str.replace(
         "Saint Francis (PA)",
         "Saint Francis"
@@ -395,7 +403,11 @@ def get_football_teams(season: int, level: str | int) -> pd.DataFrame:
         on=["school_name"],
         how="left"
     )
+
+    # Fixing an issue with this specific team
+    # not always having the correct school ID.
     teams_df.loc[teams_df["school_name"] == "Saint Francis", "school_id"] = 600
+
     teams_df.sort_values(by=["team_id"], inplace=True)
 
     teams_df = pd.merge(
@@ -404,6 +416,116 @@ def get_football_teams(season: int, level: str | int) -> pd.DataFrame:
         on="school_id",
         how="left"
     )
+    teams_df = teams_df.astype(
+        {
+            "season": "uint16",
+            "ncaa_division": "uint8",
+            "ncaa_division_formatted": "str",
+            "team_conference_name": "str",
+            "team_id": "int64",
+            "school_name": "str",
+            "sport_id": "str",
+            "school_id": "int64",
+            "nfs_team_code": "str",
+            "team_abv_1": "str",
+            "team_abv_2": "str",
+        }
+    )
+
+    # The following teams do not have team abbreviations.
+    # If they still do not have team abbreviations,
+    # this code will add *a* abbreviation just to help
+    # identify which team is which.
+
+    # Calvin (2024-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 114),
+        "team_abv_1"
+    ] = "CALV"
+
+    # Centenary (LA) (2024-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 125),
+        "team_abv_1"
+    ] = "CENT"
+
+    # Franklin Pierce (2019-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 241),
+        "team_abv_1"
+    ] = "FPU"
+
+    # Bluefield St. (2021-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 985),
+        "team_abv_1"
+    ] = "BSU"
+
+    # Erskine (2020-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 1072),
+        "team_abv_1"
+    ] = "CALV"
+
+    # Post (2022-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 1318),
+        "team_abv_1"
+    ] = "POST"
+
+    # Roosevelt (2024-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 2807),
+        "team_abv_1"
+    ] = "POST"
+
+    # Hilbert (2022-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 8398),
+        "team_abv_1"
+    ] = "POST"
+
+    # Eastern (2023-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 8968),
+        "team_abv_1"
+    ] = "EUE"
+
+    # Wheeling (2019-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 12799),
+        "team_abv_1"
+    ] = "WHL"
+
+    # Anderson (SC) (2019-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 13028),
+        "team_abv_1"
+    ] = "AND"
+
+    # Barton (2020-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 15646),
+        "team_abv_1"
+    ] = "BART"
+
+    # Lyon (2023-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 22989),
+        "team_abv_1"
+    ] = "LYN"
+
+    # Keystone (2023-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 30047),
+        "team_abv_1"
+    ] = "KEY"
+
+    # Allen (2023-present)
+    teams_df.loc[
+        (teams_df["school_id"] == 30240),
+        "team_abv_1"
+    ] = "ALL"
 
     teams_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/football/teams/"
@@ -468,9 +590,15 @@ def load_football_teams(start_year: int = 2013) -> pd.DataFrame:
     for s in ncaa_seasons:
         logging.info(f"Loading in football teams for the {s} season.")
         for d in ncaa_divisions:
-            temp_df = get_football_teams(season=s, level=d)
-            teams_df_arr.append(temp_df)
-            del temp_df
+            try:
+                temp_df = get_football_teams(season=s, level=d)
+                teams_df_arr.append(temp_df)
+                del temp_df
+            except Exception as e:
+                logging.warning(
+                    "Unhandled exception when trying to " +
+                    f"get the teams. Full exception: `{e}`"
+                )
 
     teams_df = pd.concat(teams_df_arr, ignore_index=True)
     return teams_df
@@ -2419,10 +2547,11 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
     season = 0
     away_score = 0
     home_score = 0
+    drive_num = 0
 
-    quarter_seconds_remaining = 0
-    half_seconds_remaining = 0
-    game_seconds_remaining = 0
+    quarter_seconds_remaining = 900
+    half_seconds_remaining = 1800
+    game_seconds_remaining = 3600
 
     pbp_df = pd.DataFrame()
     pbp_df_arr = []
@@ -2430,28 +2559,6 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
     temp_df = pd.DataFrame()
     home_dir = expanduser("~")
     home_dir = _format_folder_str(home_dir)
-
-    stat_columns = [
-        "season",
-        "sport_id",
-        "game_id",
-        "game_time_str",
-        "quarter_seconds_remaining",
-        "half_seconds_remaining",
-        "game_seconds_remaining",
-        "quarter_num",
-        "event_team",
-        "event_text",
-        "is_overtime",
-        "event_num",
-        "game_datetime",
-        "stadium_name",
-        "attendance",
-        "away_team_id",
-        "away_team_name",
-        "home_team_id",
-        "home_team_name",
-    ]
 
     url = f"https://stats.ncaa.org/contests/{game_id}/play_by_play"
 
@@ -2601,7 +2708,7 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
         )
 
         for d in range(0, len(drive_header_box)):
-            drive_num = d + 1
+            drive_num += 1
 
             possession_team = None
             defensive_team = None
@@ -2630,7 +2737,9 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
             score_str = drive_header_box[d].find(
                 "div", {"class": "headerRight"}
             ).text
-
+            away_score, home_score = score_str.split("-")
+            away_score = int(away_score)
+            home_score = int(home_score)
             temp_plays_arr = drive_plays_arr[dp_pointer].find_all(
                 "div", {"style": "border-bottom: 1px dotted #dcdddf;"}
             )
@@ -2651,16 +2760,16 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
                 play_text = play_text.strip()
 
                 time_str = re.findall(
-                    r"([0-9\:]+)",
+                    r"([0-9]+)\:([0-9]+)",
                     play_text
                 )
 
                 if len(time_str) == 0:
                     time_str = None
-                elif len(time_str) >= 4:
-                    pass
                 else:
-                    time_str = time_str[0]
+                    t_min = time_str[0][0]
+                    t_sec = time_str[0][1]
+                    time_str = f"{t_min}:{t_sec}"
 
                 if (
                     "start of" in play_text.lower() and
@@ -2676,6 +2785,7 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
                         quarter_num = 5
                     else:
                         quarter_num = int(quarter_str[0])
+
                 play_d_and_d = temp_play[-2].text
                 play_d_and_d = play_d_and_d.replace("\n", "")
                 play_d_and_d = play_d_and_d.strip()
@@ -2688,16 +2798,95 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
                 distance = d_and_d_arr[0][1]
                 yrdln = d_and_d_arr[0][2]
 
+                if (
+                    quarter_num == 1 and
+                    isinstance(time_str, str)
+                ):
+                    quarter_seconds_remaining = _get_seconds_from_time_str(
+                        time_str
+                    )
+                    half_seconds_remaining = (
+                        900 + _get_seconds_from_time_str(time_str)
+                    )
+                    game_seconds_remaining = (
+                        (3 * 900) + _get_seconds_from_time_str(
+                            time_str
+                        )
+                    )
+                elif (
+                    quarter_num == 2 and
+                    isinstance(time_str, str)
+                ):
+                    quarter_seconds_remaining = _get_seconds_from_time_str(
+                        time_str
+                    )
+                    half_seconds_remaining = (
+                        _get_seconds_from_time_str(time_str)
+                    )
+                    game_seconds_remaining = (
+                        (2 * 900) + _get_seconds_from_time_str(
+                            time_str
+                        )
+                    )
+                elif (
+                    quarter_num == 3 and
+                    isinstance(time_str, str)
+                ):
+                    quarter_seconds_remaining = _get_seconds_from_time_str(
+                        time_str
+                    )
+                    half_seconds_remaining = (
+                        900 + _get_seconds_from_time_str(time_str)
+                    )
+                    game_seconds_remaining = (
+                        900 + _get_seconds_from_time_str(
+                            time_str
+                        )
+                    )
+                elif (
+                    quarter_num == 4 and
+                    isinstance(time_str, str)
+                ):
+                    quarter_seconds_remaining = _get_seconds_from_time_str(
+                        time_str
+                    )
+                    half_seconds_remaining = _get_seconds_from_time_str(
+                        time_str
+                    )
+                    game_seconds_remaining = _get_seconds_from_time_str(
+                        time_str
+                    )
+                elif quarter_num >= 5:
+                    # OT is untimed in the CFB
+                    quarter_seconds_remaining = 0
+                    half_seconds_remaining = 0
+                    game_seconds_remaining = 0
+
                 temp_df = pd.DataFrame(
                     {
-                        
+                        "drive_num": drive_num,
+                        "possession_team_id": possession_team,
+                        "defensive_team": defensive_team,
+                        "posteam_type": posteam_type,
+                        "quarter_num": quarter_num,
+                        "score_str": score_str,
+                        "away_score": away_score,
+                        "home_score": home_score,
+                        "time_str": time_str,
+                        "play_text": play_text,
+                        "down": down,
+                        "distance": distance,
+                        "yrdln": yrdln,
+                        "is_overtime": is_overtime,
+                        "quarter_seconds_remaining": quarter_seconds_remaining,
+                        "half_seconds_remaining": half_seconds_remaining,
+                        "game_seconds_remaining": game_seconds_remaining,
                     },
                     index=[0]
                 )
+                pbp_df_arr.append(temp_df)
+                del temp_df
 
-    raise NotImplementedError(
-        "It's in progress, but raw PBP data isn't ready yet."
-    )
     pbp_df = pd.concat(pbp_df_arr, ignore_index=True)
     pbp_df["event_num"] = pbp_df.index + 1
     pbp_df["game_datetime"] = game_date_str
@@ -2711,7 +2900,6 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
     pbp_df["home_team_id"] = home_team_id
     pbp_df["home_team_name"] = home_team_name
 
-    pbp_df = pbp_df.reindex(columns=stat_columns)
     pbp_df = pbp_df.infer_objects()
     pbp_df.to_csv(
         f"{home_dir}/.ncaa_stats_py/football/raw_pbp/"

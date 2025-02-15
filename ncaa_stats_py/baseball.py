@@ -171,10 +171,18 @@ def get_baseball_teams(season: int, level: str | int) -> pd.DataFrame:
     age = now - file_mod_datetime
 
     if (
+        age.days >= 1 and
+        season >= now.year and
+        now.month <= 7
+    ):
+        load_from_cache = False
+    elif (
         age.days >= 14 and
         season >= (now.year - 1) and
         now.month <= 7
     ):
+        load_from_cache = False
+    elif age.days >= 35:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -201,16 +209,9 @@ def get_baseball_teams(season: int, level: str | int) -> pd.DataFrame:
 
     while found_value is False:
         for rp in ranking_periods:
-            if "final " in rp.text.lower():
-                rp_value = rp.get("value")
-                found_value = True
-                break
-            elif "-" in rp.text:
-                pass
-            else:
-                rp_value = rp.get("value")
-                found_value = True
-                break
+            rp_value = rp.get("value")
+            found_value = True
+            break
 
     url = (
         "https://stats.ncaa.org/rankings/institution_trends?"
@@ -377,9 +378,15 @@ def load_baseball_teams(start_year: int = 2008) -> pd.DataFrame:
     for s in ncaa_seasons:
         logging.info(f"Loading in baseball teams for the {s} season.")
         for d in ncaa_divisions:
-            temp_df = get_baseball_teams(season=s, level=d)
-            teams_df_arr.append(temp_df)
-            del temp_df
+            try:
+                temp_df = get_baseball_teams(season=s, level=d)
+                teams_df_arr.append(temp_df)
+                del temp_df
+            except Exception as e:
+                logging.warning(
+                    "Unhandled exception when trying to " +
+                    f"get the teams. Full exception: `{e}`"
+                )
 
     teams_df = pd.concat(teams_df_arr, ignore_index=True)
     return teams_df
@@ -1113,7 +1120,9 @@ def get_baseball_day_schedule(
         # Away team
         td_arr = away_team_row.find_all("td")
 
-        if "Canceled" in td_arr[5].text:
+        if "canceled" in td_arr[5].text.lower():
+            continue
+        elif "ppd" in td_arr[5].text.lower():
             continue
 
         try:
@@ -1853,13 +1862,6 @@ def get_baseball_player_season_batting_stats(
 
     response = _get_webpage(url=url)
     soup = BeautifulSoup(response.text, features="lxml")
-    # try:
-    #     school_name = soup.find(
-    #         "div", {"class": "card"}
-    #     ).find("img").get("alt")
-    # except Exception:
-    #     school_name = soup.find("div", {"class": "card"}).find("a").text
-    #     school_name = school_name.rsplit(" ", maxsplit=1)[0]
 
     season_name = (
         soup.find("select", {"id": "year_list"})
@@ -4219,8 +4221,21 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
         t_header_str = t_header.text
         team_id = t_header.find("a").get("href")
         team_id = team_id.replace("/teams", "")
+        team_id = team_id.replace(
+            "javascript:togglePeriodStats(competitor_",
+            ""
+        )
+        if "_year" in team_id:
+            team_id = team_id.split("_year")[0]
         team_id = team_id.replace("/", "")
-        team_id = int(team_id)
+
+        try:
+            team_id = int(team_id)
+        except Exception as e:
+            team_id = -1
+            logging.warning(
+                f"Unhandled exception: `{e}`"
+            )
 
         table_data = box.find(
             "table",
@@ -4255,8 +4270,13 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
             if "\xa0" in p_name:
                 game_started = 0
             t_cells = [x.text.strip() for x in t_cells]
-            player_id = int(player_id)
-
+            try:
+                player_id = int(player_id)
+            except Exception:
+                logging.info(
+                    "Could not find a player ID, skipping this row."
+                )
+                continue
             temp_df = pd.DataFrame(
                 data=[t_cells],
                 columns=table_headers
@@ -4844,8 +4864,17 @@ def get_raw_baseball_game_pbp(game_id: int):
         game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y TBD')
     elif "tbd" in game_date_str:
         game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y tbd')
+    elif (
+        "tbd" not in game_date_str.lower() and
+        ":" not in game_date_str.lower()
+    ):
+        game_date_str = game_date_str.replace(" ", "")
+        game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y')
     else:
-        game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y %I:%M %p')
+        game_datetime = datetime.strptime(
+            game_date_str,
+            '%m/%d/%Y %I:%M %p'
+        )
     game_datetime = game_datetime.astimezone(timezone("US/Eastern"))
     game_date_str = game_datetime.isoformat()
     del game_datetime

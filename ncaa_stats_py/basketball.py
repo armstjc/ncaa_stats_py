@@ -234,9 +234,12 @@ def get_basketball_teams(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 14 and
-        season >= (now.year - 1)
+        age.days >= 1 and
+        season >= (now.year - 1) and
+        now.month <= 7
     ):
+        load_from_cache = False
+    elif age.days >= 35:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -488,13 +491,16 @@ def load_basketball_teams(
     for s in ncaa_seasons:
         logging.info(f"Loading in basketball teams for the {s} season.")
         for d in ncaa_divisions:
-            temp_df = get_basketball_teams(
-                season=s,
-                level=d,
-                get_wbb_data=get_wbb_data
-            )
-            teams_df_arr.append(temp_df)
-            del temp_df
+            try:
+                temp_df = get_basketball_teams(season=s, level=d)
+                teams_df_arr.append(temp_df)
+                del temp_df
+            except Exception as e:
+                logging.warning(
+                    "Unhandled exception when trying to " +
+                    f"get the teams. Full exception: `{e}`"
+                )
+
 
     teams_df = pd.concat(teams_df_arr, ignore_index=True)
     teams_df = teams_df.infer_objects()
@@ -3945,8 +3951,17 @@ def get_basketball_raw_pbp(game_id: int) -> pd.DataFrame:
         game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y TBD')
     elif "tbd" in game_date_str:
         game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y tbd')
+    elif (
+        "tbd" not in game_date_str.lower() and
+        ":" not in game_date_str.lower()
+    ):
+        game_date_str = game_date_str.replace(" ", "")
+        game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y')
     else:
-        game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y %I:%M %p')
+        game_datetime = datetime.strptime(
+            game_date_str,
+            '%m/%d/%Y %I:%M %p'
+        )
     game_datetime = game_datetime.astimezone(timezone("US/Eastern"))
     game_date_str = game_datetime.isoformat()
     del game_datetime
