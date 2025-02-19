@@ -1124,6 +1124,10 @@ def get_baseball_day_schedule(
             continue
         elif "ppd" in td_arr[5].text.lower():
             continue
+        elif "canceled" in td_arr[-1].text.lower():
+            continue
+        elif "ppd" in td_arr[-1].text.lower():
+            continue
 
         try:
             away_team_name = td_arr[0].find("img").get("alt")
@@ -4877,6 +4881,7 @@ def get_raw_baseball_game_pbp(game_id: int):
         )
     game_datetime = game_datetime.astimezone(timezone("US/Eastern"))
     game_date_str = game_datetime.isoformat()
+    season = game_datetime.year
     del game_datetime
 
     stadium_str = info_table_rows[4].find("td").text
@@ -4978,6 +4983,7 @@ def get_raw_baseball_game_pbp(game_id: int):
     pbp_df["stadium_name"] = stadium_str
     pbp_df["attendance"] = attendance_int
     pbp_df["sport_id"] = sport_id
+    pbp_df["season"] = season
 
     pbp_df = pbp_df.infer_objects()
     pbp_df.to_csv(

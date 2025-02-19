@@ -1,6 +1,9 @@
 # `ncaa_stats_py` Changelog
 
 ## 0.0.11: The "Football" update
+- Added a `[season]` column to `ncaa_stats_py.baseball.get_baseball_raw_pbp()`,
+- Fixed a bug where `ncaa_stats_py.baseball.get_baseball_day_schedule()` would crash and burn if games were marked as "canceled" in a specific way.
+- Set the package version to `0.0.11`.
 
 ## 0.0.10: The "Emergency Fix #2" update
 - Fixed a logic issue when parsing the ranking period for D3 baseball in the 2025 season.
