@@ -4123,6 +4123,13 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
         "fielding_IDP",
         "fielding_TP",
         "fielding_SBA%",
+        # misc
+        "stadium_name",
+        "attendance",
+        "away_team_id",
+        "home_team_id",
+        "away_team_name",
+        "home_team_name",
     ]
 
     url = f"https://stats.ncaa.org/contests/{game_id}/individual_stats"
@@ -4213,6 +4220,47 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
     season = game_datetime.year
     game_date_str = game_datetime.isoformat()
     del game_datetime
+
+    stadium_str = info_table_rows[4].find("td").text
+
+    attendance_str = info_table_rows[5].find("td").text
+    attendance_int = re.findall(
+        r"([0-9\,]+)",
+        attendance_str
+    )[0]
+    attendance_int = attendance_int.replace(",", "")
+    attendance_int = int(attendance_int)
+
+    del attendance_str
+
+    team_cards = soup.find_all(
+        "td",
+        {
+            "valign": "center",
+            "class": "grey_text d-none d-sm-table-cell"
+        }
+    )
+
+    away_url = team_cards[0].find_all("a")
+    away_url = away_url[0]
+    home_url = team_cards[1].find_all("a")
+    home_url = home_url[0]
+
+    away_team_name = away_url.text
+    home_team_name = home_url.text
+
+    away_team_id = away_url.get("href")
+    home_team_id = home_url.get("href")
+
+    away_team_id = away_team_id.replace("/teams", "")
+    away_team_id = away_team_id.replace("/team", "")
+    away_team_id = away_team_id.replace("/", "")
+    away_team_id = int(away_team_id)
+
+    home_team_id = home_team_id.replace("/teams", "")
+    home_team_id = home_team_id.replace("/team", "")
+    home_team_id = home_team_id.replace("/", "")
+    home_team_id = int(home_team_id)
 
     table_boxes = soup.find_all("div", {"class": "card p-0 table-responsive"})
 
@@ -4464,6 +4512,13 @@ def get_baseball_game_player_stats(game_id: int) -> pd.DataFrame:
     stats_df['sport_id'] = sport_id
     stats_df["game_id"] = game_id
     stats_df["game_datetime"] = game_date_str
+    stats_df["stadium_name"] = stadium_str
+    stats_df["attendance"] = attendance_int
+    stats_df["away_team_id"] = away_team_id
+    stats_df["home_team_id"] = home_team_id
+    stats_df["away_team_name"] = away_team_name
+    stats_df["home_team_name"] = home_team_name
+
     for i in stats_df.columns:
         if i in stat_columns:
             pass

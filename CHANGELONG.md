@@ -1,6 +1,13 @@
 # `ncaa_stats_py` Changelog
 
 ## 0.0.11: The "Football" update
+- For `ncaa_stats_py.baseball.get_baseball_game_player_stats()`, the following columns have been added:
+    - `[stadium_name]`
+    - `[attendance]`
+    - `[away_team_id]`
+    - `[home_team_id]`
+    - `[away_team_name]`
+    - `[home_team_name]`
 - Fixed an issue where stats would be refreshed too often.
 - Added a `[season]` column to `ncaa_stats_py.baseball.get_baseball_raw_pbp()`,
 - Fixed a bug where `ncaa_stats_py.baseball.get_baseball_day_schedule()` would crash and burn if games were marked as "canceled" in a specific way.
