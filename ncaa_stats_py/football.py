@@ -761,7 +761,7 @@ def get_football_team_schedule(team_id: int) -> pd.DataFrame:
     now = datetime.today()
 
     age = now - file_mod_datetime
-    if age.days >= 1 and season >= now.year and now.month <= 7:
+    if age.days > 1 and season >= now.year and now.month <= 7:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -1646,7 +1646,7 @@ def get_full_football_schedule(
 
     age = now - file_mod_datetime
 
-    if age.days >= 1 and season >= now.year and now.month <= 7:
+    if age.days > 1 and season >= now.year and now.month <= 7:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -2158,7 +2158,7 @@ def get_football_player_game_stats(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         (season - 1) >= now.year
     ):
         load_from_cache = False

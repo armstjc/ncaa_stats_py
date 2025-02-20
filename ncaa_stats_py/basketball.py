@@ -234,7 +234,7 @@ def get_basketball_teams(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= (now.year - 1) and
         now.month <= 7
     ):
@@ -670,7 +670,7 @@ def get_basketball_team_schedule(team_id: int) -> pd.DataFrame:
 
     age = now - file_mod_datetime
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year
     ):
         load_from_cache = False
@@ -1551,7 +1551,7 @@ def get_full_basketball_schedule(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year
     ):
         load_from_cache = False
@@ -2130,7 +2130,7 @@ def get_basketball_player_season_stats(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year
     ):
         load_from_cache = False
@@ -2570,7 +2570,7 @@ def get_basketball_player_game_stats(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         (season - 1) >= now.year
     ):
         load_from_cache = False

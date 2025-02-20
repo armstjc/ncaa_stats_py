@@ -222,7 +222,7 @@ def get_lacrosse_teams(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year and
         now.month <= 7
     ):
@@ -717,7 +717,7 @@ def get_lacrosse_team_schedule(team_id: int) -> pd.DataFrame:
     now = datetime.today()
 
     age = now - file_mod_datetime
-    if age.days >= 1 and season >= now.year and now.month <= 7:
+    if age.days > 1 and season >= now.year and now.month <= 7:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -1659,7 +1659,7 @@ def get_full_lacrosse_schedule(
 
     age = now - file_mod_datetime
 
-    if age.days >= 1 and season >= now.year:
+    if age.days > 1 and season >= now.year:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -2791,7 +2791,7 @@ def get_lacrosse_player_game_stats(player_id: int) -> pd.DataFrame:
 
     age = now - file_mod_datetime
 
-    if age.days >= 1 and now.year:
+    if age.days > 1 and now.year:
         load_from_cache = False
 
     if load_from_cache is True:

@@ -1,6 +1,7 @@
 # `ncaa_stats_py` Changelog
 
 ## 0.0.11: The "Football" update
+- Fixed an issue where stats would be refreshed too often.
 - Added a `[season]` column to `ncaa_stats_py.baseball.get_baseball_raw_pbp()`,
 - Fixed a bug where `ncaa_stats_py.baseball.get_baseball_day_schedule()` would crash and burn if games were marked as "canceled" in a specific way.
 - Set the package version to `0.0.11`.
