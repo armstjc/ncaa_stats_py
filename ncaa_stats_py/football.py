@@ -20,11 +20,13 @@ from dateutil import parser
 from pytz import timezone
 from tqdm import tqdm
 
+from ncaa_stats_py.helpers.football import _get_yardline, _football_pbp_helper
 from ncaa_stats_py.utls import (
     _format_folder_str,
     _get_schools,
     _get_seconds_from_time_str,
     _get_webpage,
+    _name_smother,
 )
 
 
@@ -214,7 +216,6 @@ def get_football_teams(season: int, level: str | int) -> pd.DataFrame:
 
     if load_from_cache is True:
         return teams_df
-
 
     try:
         team_ids_df.read_csv(
@@ -465,7 +466,12 @@ def get_football_teams(season: int, level: str | int) -> pd.DataFrame:
     teams_df.loc[
         (teams_df["school_id"] == 1072),
         "team_abv_1"
-    ] = "CALV"
+    ] = "ECSP"
+
+    teams_df.loc[
+        (teams_df["school_id"] == 1072),
+        "team_abv_2"
+    ] = "ECSP"
 
     # Post (2022-present)
     teams_df.loc[
@@ -761,7 +767,7 @@ def get_football_team_schedule(team_id: int) -> pd.DataFrame:
     now = datetime.today()
 
     age = now - file_mod_datetime
-    if age.days >= 1 and season >= now.year and now.month <= 7:
+    if age.days > 1 and season >= now.year and now.month <= 7:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -1646,7 +1652,7 @@ def get_full_football_schedule(
 
     age = now - file_mod_datetime
 
-    if age.days >= 1 and season >= now.year and now.month <= 7:
+    if age.days > 1 and season >= now.year and now.month <= 7:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -2158,7 +2164,7 @@ def get_football_player_game_stats(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         (season - 1) >= now.year
     ):
         load_from_cache = False
@@ -2533,6 +2539,80 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
     df = get_football_raw_pbp(6081029)
     print(df)
 
+    # Get the play-by-play data of a November 29th, 2024
+    # game between the Texas St. Bobcats and the South Alabama Jaguars.
+    print(
+        "Get the play-by-play data of an November 29th, 2024 "
+        + "game between the Texas St. Bobcats and the South Alabama Jaguars."
+    )
+    df = get_football_raw_pbp(5362152)
+    print(df)
+
+    # Get the play-by-play data of a November 9th, 2024
+    # between the Texas Southern Tigers and the Alcorn Braves.
+    print(
+        "Get the play-by-play data of a November 9th, 2024 "
+        "between the Texas Southern Tigers and the Alcorn Braves."
+    )
+    df = get_football_raw_pbp(5367381)
+    print(df)
+
+    # Get the play-by-play data of an October 28th, 2023
+    # game between the Northern St. Wolves
+    # and the Concordia-St. Paul Golden Bears.
+    print(
+        "Get the play-by-play data of an October 28th, 2023 "
+        + "game between the Northern St. Wolves and " +
+        "the Concordia-St. Paul Golden Bears."
+    )
+    df = get_football_raw_pbp(3153291)
+    print(df)
+
+    # Get the play-by-play data of an October 29th, 2022 game
+    # between the Coast Guard Bears and the MIT Engineers.
+    print(
+        "Get the play-by-play data of an October 29th, 2022 game "
+        + "between the Coast Guard Bears and the MIT Engineers."
+    )
+    df = get_football_raw_pbp(2279042)
+    print(df)
+
+    # Get the play-by-play data of a September 25th, 2021 game
+    # between the West Virginia Mountaineers and the Oklahoma Sooners.
+    print(
+        "Get the play-by-play data of a September 25th, 2021 game "
+        + "between the West Virginia Mountaineers and the Oklahoma Sooners."
+    )
+    df = get_football_raw_pbp(2082723)
+    print(df)
+
+    # Get the play-by-play data of an September 4th, 2021 game
+    # between the Gwynedd Mercy Griffins and the Keystone Giants.
+    print(
+        "Get the play-by-play data of an September 4th, 2021 game "
+        + "between the Virginia Union Panthers and the Hampton Pirates."
+    )
+    df = get_football_raw_pbp(2082009)
+    print(df)
+
+    # Get the play-by-play data of a March 13th, 2021 game
+    # between the Shorter Hawks and Erskine The Flying Fleet.
+    print(
+        "Get the play-by-play data of a March 13th, 2021 game "
+        + "between the Shorter Hawks and Erskine The Flying Fleet."
+    )
+    df = get_football_raw_pbp(1994440)
+    print(df)
+
+    # Get the play-by-play data of a November 9th, 2019 game
+    # between the Millikin Big Blue and the WashU Bears.
+    print(
+        "Get the play-by-play data of an November 9th, 2019 game "
+        + "between the Millikin Big Blue and the WashU Bears."
+    )
+    df = get_football_raw_pbp(1738218)
+    print(df)
+
     ```
 
     Returns
@@ -2548,6 +2628,12 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
     away_score = 0
     home_score = 0
     drive_num = 0
+    yardline_100 = 0
+
+    home_school_name = ""
+    away_school_name = ""
+    home_team_abv = ""
+    away_team_abv = ""
 
     quarter_seconds_remaining = 900
     half_seconds_remaining = 1800
@@ -2607,6 +2693,7 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
     if load_from_cache is True:
         return games_df
 
+    teams_df = load_football_teams()
     response = _get_webpage(url=url)
     soup = BeautifulSoup(response.text, features="lxml")
 
@@ -2641,6 +2728,8 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
 
     if game_datetime.year == 2021 and game_datetime.month < 8:
         season = 2020
+    elif game_datetime.month < 6:
+        season = game_datetime.year - 1
     else:
         season = game_datetime.year
 
@@ -2686,6 +2775,20 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
     home_team_id = home_team_id.replace("/", "")
     home_team_id = int(home_team_id)
 
+    home_temp_df = teams_df[teams_df["team_id"] == home_team_id]
+    home_school_id = home_temp_df["school_id"].iloc[0]
+    home_team_abv_1 = home_temp_df["team_abv_1"].iloc[0]
+    home_team_abv_2 = home_temp_df["team_abv_2"].iloc[0]
+    home_team_abv_3 = home_temp_df["team_abv_3"].iloc[0]
+    home_school_name = home_temp_df["school_name"].iloc[0]
+
+    away_temp_df = teams_df[teams_df["team_id"] == away_team_id]
+    away_school_id = away_temp_df["school_id"].iloc[0]
+    away_team_abv_1 = away_temp_df["team_abv_1"].iloc[0]
+    away_team_abv_2 = away_temp_df["team_abv_2"].iloc[0]
+    away_team_abv_3 = away_temp_df["team_abv_3"].iloc[0]
+    away_school_name = away_temp_df["school_name"].iloc[0]
+
     quarter_boxes_arr = soup.find(
         "div", {"style": "width: 50%; margin-left: auto; margin-right: auto;"}
     )
@@ -2699,6 +2802,9 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
     for i in range(0, len(quarter_boxes_arr)):
         dp_pointer = 0
         quarter_num = i + 1
+
+        if quarter_num >= 5:
+            is_overtime = True
         q_box = quarter_boxes_arr[i]
         drive_header_box = q_box.find_all(
             "h5", class_=re.compile("scoring_play")
@@ -2710,8 +2816,11 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
         for d in range(0, len(drive_header_box)):
             drive_num += 1
 
-            possession_team = None
-            defensive_team = None
+            possession_team = ""
+            defensive_team = ""
+            drive_result = ""
+            drive_plays = 0
+            drive_yards = 0
 
             drive_team = drive_header_box[d].find(
                 "img"
@@ -2734,12 +2843,44 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
                 "div", {"class": "headerLeft"}
             )[1].text
             drive_str = drive_str.replace("\n", "")
+            drive_str_arr = re.findall(
+                r"([a-zA-Z\s]+)([0-9\:]+), ?([A-Za-z0-9]+), ?([0-9]+) ?" +
+                r"play[s]?, ?([\-0-9]+) ?yard[s]?, ?([0-9\:]+)",
+                drive_str
+            )
+            drive_result = drive_str_arr[0][0]
+            drive_plays = drive_str_arr[0][3]
+            drive_yards = drive_str_arr[0][4]
+
+            drive_plays = int(drive_plays)
+            drive_yards = int(drive_yards)
+
             score_str = drive_header_box[d].find(
                 "div", {"class": "headerRight"}
             ).text
             away_score, home_score = score_str.split("-")
-            away_score = int(away_score)
-            home_score = int(home_score)
+            try:
+                away_score = int(away_score)
+            except ValueError:
+                logging.info(
+                    "No away score info for this drive."
+                )
+            except Exception as e:
+                raise e
+            try:
+                home_score = int(home_score)
+            except ValueError:
+                logging.info(
+                    "No home score info for this drive."
+                )
+            except Exception as e:
+                raise e
+
+            if dp_pointer >= len(drive_plays_arr):
+                # If for some bizarre reason this happens,
+                # we are now out of range of this array
+                # and need to get to the next part of this game.
+                continue
             temp_plays_arr = drive_plays_arr[dp_pointer].find_all(
                 "div", {"style": "border-bottom: 1px dotted #dcdddf;"}
             )
@@ -2752,11 +2893,22 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
                     dp_pointer += 1
 
             for p in range(0, len(temp_plays_arr)):
+                team_side = None
                 temp_play = temp_plays_arr[p]
                 temp_play = temp_play.find_all("span")
 
                 play_text = temp_play[-1].text
                 play_text = play_text.replace("\n", "")
+                play_text = play_text.replace(f"{season}", "")
+                play_text = play_text.replace(f"{season+1}", "")
+                play_text = play_text.replace(
+                    f"{home_school_name.upper()}",
+                    f"{home_team_abv_1}"
+                )
+                play_text = play_text.replace(
+                    f"{away_school_name.upper()}",
+                    f"{away_team_abv_1}"
+                )
                 play_text = play_text.strip()
 
                 time_str = re.findall(
@@ -2790,13 +2942,89 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
                 play_d_and_d = play_d_and_d.replace("\n", "")
                 play_d_and_d = play_d_and_d.strip()
 
-                d_and_d_arr = re.findall(
-                    r"([0-9]+)[a-zA-Z]+ \& ([0-9]+) at ([a-zA-Z0-9]+)",
-                    play_d_and_d
-                )
-                down = d_and_d_arr[0][0]
-                distance = d_and_d_arr[0][1]
-                yrdln = d_and_d_arr[0][2]
+                if "0th & 0 at" in play_d_and_d:
+                    pass
+                else:
+                    d_and_d_arr = re.findall(
+                        r"([0-9]+)[a-zA-Z]+ \& ([0-9]+) at ([a-zA-Z0-9]+)",
+                        play_d_and_d
+                    )
+                    down = d_and_d_arr[0][0]
+                    distance = d_and_d_arr[0][1]
+                    yrdln = d_and_d_arr[0][2]
+                    yrdln = yrdln.replace(
+                        f"{home_school_name.upper()}",
+                        f"{home_team_abv_1}"
+                    )
+                    yrdln = yrdln.replace(
+                        f"{away_school_name.upper()}",
+                        f"{away_team_abv_1}"
+                    )
+                    del d_and_d_arr
+
+                # We need to know this info to get
+                # a `[yardline_100]` column up and running.
+                # If we don't have a defined home/away team abbreviation,
+                # get one, or give up because we can't make that call.
+                temp_home_1 = home_team_abv_1[0:2]
+                temp_away_1 = away_team_abv_1[0:2]
+                temp_home_2 = home_team_abv_2[0:2]
+                temp_away_2 = away_team_abv_2[0:2]
+                if home_team_abv_1 in yrdln and len(home_team_abv) == 0:
+                    home_team_abv = home_team_abv_1
+                    team_side = home_team_id
+                elif away_team_abv_1 in yrdln and len(away_team_abv) == 0:
+                    away_team_abv = away_team_abv_1
+                    team_side = away_team_id
+                elif home_team_abv_2 in yrdln and len(home_team_abv) == 0:
+                    home_team_abv = home_team_abv_2
+                    team_side = home_team_id
+                elif away_team_abv_2 in yrdln and len(away_team_abv) == 0:
+                    away_team_abv = away_team_abv_2
+                    team_side = away_team_id
+                elif temp_home_1 in yrdln:
+                    home_team_abv = home_team_abv_1
+                    team_side = home_team_id
+                elif temp_away_1 in yrdln:
+                    away_team_abv = away_team_abv_1
+                    team_side = away_team_id
+                elif temp_home_2 in yrdln:
+                    home_team_abv = home_team_abv_1
+                    team_side = home_team_id
+                elif temp_away_2 in yrdln:
+                    away_team_abv = away_team_abv_1
+                    team_side = away_team_id
+                elif len(home_team_abv) > 0 and home_team_abv in yrdln:
+                    team_side = home_team_id
+                elif len(away_team_abv) > 0 and away_team_abv in yrdln:
+                    team_side = away_team_id
+                elif len(home_team_abv_3) > 0 and home_team_abv_3 in yrdln:
+                    team_side = home_team_id
+                elif len(away_team_abv_3) > 0 and away_team_abv_3 in yrdln:
+                    team_side = away_team_id
+
+                else:
+                    raise IndexError(
+                        "Could not find out which side " +
+                        f"the following yardline is on: {yrdln}"
+                    )
+
+                if team_side == possession_team:
+                    yardline_100 = _get_yardline(
+                        yardline=yrdln,
+                        is_posteam_side=True
+                    )
+                elif team_side == defensive_team:
+                    yardline_100 = _get_yardline(
+                        yardline=yrdln,
+                        is_posteam_side=False
+                    )
+                else:
+                    raise SystemError(
+                        "A Logic error has occurred when trying to " +
+                        "figure out what yardline this play started at: " +
+                        f"{play_text}."
+                    )
 
                 if (
                     quarter_num == 1 and
@@ -2864,23 +3092,31 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
 
                 temp_df = pd.DataFrame(
                     {
-                        "drive_num": drive_num,
-                        "possession_team_id": possession_team,
+                        "possession_team": possession_team,
                         "defensive_team": defensive_team,
+                        # "pos_team_abv": pos_team_abv,
+                        # "def_team_abv": def_team_abv,
                         "posteam_type": posteam_type,
                         "quarter_num": quarter_num,
                         "score_str": score_str,
                         "away_score": away_score,
                         "home_score": home_score,
                         "time_str": time_str,
+                        "yardline_100": yardline_100,
                         "play_text": play_text,
                         "down": down,
                         "distance": distance,
                         "yrdln": yrdln,
+                        "team_side": team_side,
                         "is_overtime": is_overtime,
                         "quarter_seconds_remaining": quarter_seconds_remaining,
                         "half_seconds_remaining": half_seconds_remaining,
                         "game_seconds_remaining": game_seconds_remaining,
+                        "drive_num": drive_num,
+                        "drive_str": drive_str.replace(",", " ").strip(),
+                        "drive_result": drive_result,
+                        "drive_plays": drive_plays,
+                        "drive_yards": drive_yards,
                     },
                     index=[0]
                 )
@@ -2896,9 +3132,13 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
     pbp_df["stadium_name"] = stadium_str
     pbp_df["attendance"] = attendance_int
     pbp_df["away_team_id"] = away_team_id
+    pbp_df["away_school_id"] = away_school_id
     pbp_df["away_team_name"] = away_team_name
+    pbp_df["away_team_abv"] = away_team_abv
     pbp_df["home_team_id"] = home_team_id
+    pbp_df["home_school_id"] = home_school_id
     pbp_df["home_team_name"] = home_team_name
+    pbp_df["home_team_abv"] = home_team_abv
 
     pbp_df = pbp_df.infer_objects()
     pbp_df.to_csv(
@@ -2906,4 +3146,254 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
         + f"{game_id}_raw_pbp.csv",
         index=False
     )
+    return pbp_df
+
+
+def get_parsed_football_pbp(game_id: int) -> pd.DataFrame:
+    """
+    Given a valid game ID,
+    this function will attempt to get the play-by-play (PBP)
+    data for that game.
+
+    Parameters
+    ----------
+    `game_id` (int, mandatory):
+        Required argument.
+        Specifies the game you want play-by-play data (PBP) from.
+
+    Usage
+    ----------
+    ```python
+
+    from ncaa_stats_py.football import get_parsed_football_pbp
+
+
+    # Get the play-by-play data of the
+    # 2025 NCAA FBS National Championship game.
+    print(
+        "Get the play-by-play data of the "
+        + "2025 NCAA FBS National Championship game."
+    )
+    df = get_parsed_football_pbp(6081029)
+    print(df)
+
+    # Get the play-by-play data of a November 29th, 2024
+    # game between the Texas St. Bobcats and the South Alabama Jaguars.
+    print(
+        "Get the play-by-play data of an November 29th, 2024 "
+        + "game between the Texas St. Bobcats and the South Alabama Jaguars."
+    )
+    df = get_parsed_football_pbp(5362152)
+    print(df)
+
+    # Get the play-by-play data of a November 9th, 2024
+    # between the Texas Southern Tigers and the Alcorn Braves.
+    print(
+        "Get the play-by-play data of a November 9th, 2024 "
+        "between the Texas Southern Tigers and the Alcorn Braves."
+    )
+    df = get_parsed_football_pbp(5367381)
+    print(df)
+
+    # Get the play-by-play data of an October 28th, 2023
+    # game between the Northern St. Wolves
+    # and the Concordia-St. Paul Golden Bears.
+    print(
+        "Get the play-by-play data of an October 28th, 2023 "
+        + "game between the Northern St. Wolves and " +
+        "the Concordia-St. Paul Golden Bears."
+    )
+    df = get_parsed_football_pbp(3153291)
+    print(df)
+
+    # Get the play-by-play data of an October 29th, 2022 game
+    # between the Coast Guard Bears and the MIT Engineers.
+    print(
+        "Get the play-by-play data of an October 29th, 2022 game "
+        + "between the Coast Guard Bears and the MIT Engineers."
+    )
+    df = get_parsed_football_pbp(2279042)
+    print(df)
+
+    # Get the play-by-play data of a September 25th, 2021 game
+    # between the West Virginia Mountaineers and the Oklahoma Sooners.
+    print(
+        "Get the play-by-play data of a September 25th, 2021 game "
+        + "between the West Virginia Mountaineers and the Oklahoma Sooners."
+    )
+    df = get_parsed_football_pbp(2082723)
+    print(df)
+
+    # Get the play-by-play data of an September 4th, 2021 game
+    # between the Gwynedd Mercy Griffins and the Keystone Giants.
+    print(
+        "Get the play-by-play data of an September 4th, 2021 game "
+        + "between the Virginia Union Panthers and the Hampton Pirates."
+    )
+    df = get_parsed_football_pbp(2082009)
+    print(df)
+
+    # Get the play-by-play data of a March 13th, 2021 game
+    # between the Shorter Hawks and Erskine The Flying Fleet.
+    print(
+        "Get the play-by-play data of a March 13th, 2021 game "
+        + "between the Shorter Hawks and Erskine The Flying Fleet."
+    )
+    df = get_parsed_football_pbp(1994440)
+    print(df)
+
+    # Get the play-by-play data of a November 9th, 2019 game
+    # between the Millikin Big Blue and the WashU Bears.
+    print(
+        "Get the play-by-play data of an November 9th, 2019 game "
+        + "between the Millikin Big Blue and the WashU Bears."
+    )
+    df = get_parsed_football_pbp(1738218)
+    print(df)
+
+    ```
+
+    Returns
+    ----------
+    A pandas `DataFrame` object with a play-by-play (PBP) data in a given game.
+
+    """
+    home_team_id = 0
+    away_team_id = 0
+    sport_id = ""
+
+    home_roster_df = pd.DataFrame()
+    away_roster_df = pd.DataFrame()
+
+    home_dir = expanduser("~")
+    home_dir = _format_folder_str(home_dir)
+
+    if exists(f"{home_dir}/.ncaa_stats_py/"):
+        pass
+    else:
+        mkdir(f"{home_dir}/.ncaa_stats_py/")
+
+    if exists(f"{home_dir}/.ncaa_stats_py/football/"):
+        pass
+    else:
+        mkdir(f"{home_dir}/.ncaa_stats_py/football/")
+
+    if exists(f"{home_dir}/.ncaa_stats_py/football/parsed_pbp/"):
+        pass
+    else:
+        mkdir(f"{home_dir}/.ncaa_stats_py/football/parsed_pbp/")
+
+    if exists(
+        f"{home_dir}/.ncaa_stats_py/football/parsed_pbp/"
+        + f"{game_id}_parsed_pbp.csv"
+    ):
+        games_df = pd.read_csv(
+            f"{home_dir}/.ncaa_stats_py/football/parsed_pbp/"
+            + f"{game_id}_parsed_pbp.csv"
+        )
+        games_df = games_df.infer_objects()
+        file_mod_datetime = datetime.fromtimestamp(
+            getmtime(
+                f"{home_dir}/.ncaa_stats_py/football/parsed_pbp/"
+                + f"{game_id}_parsed_pbp.csv"
+            )
+        )
+        load_from_cache = True
+    else:
+        file_mod_datetime = datetime.today()
+        load_from_cache = False
+
+    now = datetime.today()
+
+    age = now - file_mod_datetime
+
+    if age.days > 1:
+        load_from_cache = False
+
+    if load_from_cache is True:
+        return games_df
+
+    raw_df = get_football_raw_pbp(game_id=game_id)
+
+    # sport_id = raw_df["sport_id"].iloc[0]
+    home_team_id = raw_df["home_team_id"].iloc[0]
+    away_team_id = raw_df["away_team_id"].iloc[0]
+
+    pbp_df = _football_pbp_helper(raw_df=raw_df)
+
+    home_roster_df = get_football_team_roster(team_id=home_team_id)
+    home_roster_df["player_full_name"] = home_roster_df[
+        "player_full_name"
+    ].str.lower()
+    home_roster_df["player_full_name"] = home_roster_df[
+        "player_full_name"
+    ].str.replace(".", "")
+
+    away_roster_df = get_football_team_roster(team_id=away_team_id)
+    away_roster_df["player_full_name"] = away_roster_df[
+        "player_full_name"
+    ].str.lower()
+    away_roster_df["player_full_name"] = away_roster_df[
+        "player_full_name"
+    ].str.replace(".", "")
+
+    home_players_arr = dict(
+        zip(
+            home_roster_df["player_full_name"], home_roster_df["player_id"]
+        )
+    )
+    away_players_arr = dict(
+        zip(
+            away_roster_df["player_full_name"], away_roster_df["player_id"]
+        )
+    )
+    players_arr = home_players_arr | away_players_arr
+
+    mapper_dict = {
+        "td_player_id": "td_player_name",
+        "passer_player_id": "passer_player_name",
+        "receiver_player_id": "receiver_player_name",
+        "rusher_player_id": "rusher_player_name",
+        "lateral_rusher_player_id": "lateral_rusher_player_name",
+        "kicker_player_id": "kicker_player_name",
+        "own_kickoff_recovery_player_id": "own_kickoff_recovery_player_name",
+        "kickoff_returner_player_id": "kickoff_returner_player_name",
+        "lateral_kickoff_returner_player_id":
+            "lateral_kickoff_returner_player_name",
+        "long_snapper_player_id": "long_snapper_player_name",
+        "holder_player_id": "holder_player_name",
+        "punter_player_id": "punter_player_name",
+        "punt_returner_player_id": "punt_returner_player_name",
+        "sack_player_id": "sack_player_name",
+        "half_sack_1_player_id": "half_sack_1_player_name",
+        "half_sack_2_player_id": "half_sack_2_player_name",
+        "tackle_for_loss_1_player_id": "tackle_for_loss_1_player_id",
+        "tackle_for_loss_2_player_id": "tackle_for_loss_2_player_id",
+        "forced_fumble_player_1_player_id":
+            "forced_fumble_player_1_player_name",
+        "forced_fumble_player_2_player_id":
+            "forced_fumble_player_2_player_name",
+        "solo_tackle_1_player_id": "solo_tackle_1_player_name",
+        "solo_tackle_2_player_id": "solo_tackle_2_player_name",
+        "assist_tackle_1_player_id": "assist_tackle_1_player_name",
+        "assist_tackle_2_player_id": "assist_tackle_2_player_name",
+        "assist_tackle_3_player_id": "assist_tackle_3_player_name",
+        "assist_tackle_4_player_id": "assist_tackle_4_player_name",
+        "fumble_recovery_1_player_id": "fumble_recovery_1_player_name",
+        "fumble_recovery_2_player_id": "fumble_recovery_2_player_name",
+    }
+    # for i in range(0, len(id_cols)):
+    for id_column, name_column in mapper_dict.items():
+        # name_column = name_cols[i]
+        # id_column = id_cols[i]
+        pbp_df[name_column] = pbp_df[name_column].str.replace("3a", "")
+        pbp_df[name_column] = pbp_df[name_column].str.replace(".", "")
+        pbp_df[name_column] = pbp_df[name_column].map(_name_smother)
+        pbp_df[id_column] = pbp_df[name_column].str.lower()
+        pbp_df.loc[pbp_df[id_column].notnull(), id_column] = pbp_df[
+            id_column
+        ]
+        pbp_df[id_column] = pbp_df[id_column].map(players_arr)
+
+    pbp_df.to_csv("test.csv", index=False)
     return pbp_df

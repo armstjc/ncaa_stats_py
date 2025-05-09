@@ -144,7 +144,7 @@ def get_field_hockey_teams(season: int, level: str | int) -> pd.DataFrame:
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year and
         now.month <= 7
     ):
@@ -488,7 +488,7 @@ def get_field_hockey_team_schedule(team_id: int) -> pd.DataFrame:
     now = datetime.today()
 
     age = now - file_mod_datetime
-    if age.days >= 1 and season >= now.year and now.month <= 7:
+    if age.days > 1 and season >= now.year and now.month <= 7:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -1325,7 +1325,7 @@ def get_full_field_hockey_schedule(
 
     age = now - file_mod_datetime
 
-    if age.days >= 1 and season >= now.year and now.month <= 7:
+    if age.days > 1 and season >= now.year and now.month <= 7:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -1785,7 +1785,7 @@ def get_field_hockey_player_season_stats(
 
     age = now - file_mod_datetime
 
-    if age.days >= 1 and season >= now.year and now.month <= 7:
+    if age.days > 1 and season >= now.year and now.month <= 7:
         load_from_cache = False
 
     if load_from_cache is True:
@@ -2094,7 +2094,7 @@ def get_field_hockey_player_game_stats(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         (season - 1) >= now.year
     ):
         load_from_cache = False

@@ -168,7 +168,7 @@ def get_softball_teams(season: int, level: str | int) -> pd.DataFrame:
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year and
         now.month <= 7
     ):
@@ -538,7 +538,7 @@ def get_softball_team_schedule(team_id: int) -> pd.DataFrame:
 
     age = now - file_mod_datetime
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year and
         now.month <= 7
     ):
@@ -1409,7 +1409,7 @@ def get_full_softball_schedule(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year and
         now.month <= 7
     ):
@@ -1940,7 +1940,7 @@ def get_softball_player_season_batting_stats(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year and
         now.month <= 7
     ):
@@ -2347,7 +2347,7 @@ def get_softball_player_season_pitching_stats(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year and
         now.month <= 7
     ):
@@ -2717,7 +2717,7 @@ def get_softball_player_season_fielding_stats(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year and
         now.month <= 7
     ):
@@ -3055,7 +3055,7 @@ def get_softball_player_game_batting_stats(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year and
         now.month <= 7
     ):
@@ -3514,7 +3514,7 @@ def get_softball_player_game_pitching_stats(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year and
         now.month <= 7
     ):
@@ -3961,7 +3961,7 @@ def get_softball_player_game_fielding_stats(
     age = now - file_mod_datetime
 
     if (
-        age.days >= 1 and
+        age.days > 1 and
         season >= now.year and
         now.month <= 7
     ):
