@@ -21,6 +21,7 @@ from os import mkdir
 from os.path import exists, expanduser, getmtime
 from secrets import SystemRandom
 
+import numpy as np
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -648,7 +649,7 @@ def _web_headers() -> dict:
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4)"
         + " AppleWebKit/537.36 (KHTML, like Gecko) "
-        + "Chrome/132.0.0.0 Safari/537.36",
+        + "Chrome/135.0.0.0 Safari/537.36",
     }
     return headers
 
@@ -663,6 +664,7 @@ def _get_webpage(url: str) -> requests.Response:
     if response.status_code == 200:
         return response
     elif response.status_code == 400:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 400]: Could not access "
             + "the following URL due to a malformed request "
@@ -670,12 +672,14 @@ def _get_webpage(url: str) -> requests.Response:
             + f"this code that just got this error).\nURL:{url}"
         )
     elif response.status_code == 401:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 401]: Could not access the following URL "
             + "because the website does not authorize your access "
             + f"to this part of the website.\nURL:{url}"
         )
     elif response.status_code == 403:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 403]: Could not access the following URL "
             + "because the website outright refuses your access "
@@ -683,23 +687,27 @@ def _get_webpage(url: str) -> requests.Response:
             + f"\nURL:{url}"
         )
     elif response.status_code == 404:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 404]: Could not find anything associated "
             + "with the following URL at this time."
             + f"\nURL:{url}"
         )
     elif response.status_code == 408:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 408]: The request for the following URL timed out." +
             f"\nURL:{url}"
         )
     elif response.status_code == 418:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 418]: The request for the following URL "
             + "could not be completed because the server is a teapot."
             + f"\nURL:{url}"
         )
     elif response.status_code == 429:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 429]: The request for the following URL "
             + "could not be completed because the server believes that "
@@ -707,6 +715,7 @@ def _get_webpage(url: str) -> requests.Response:
             + f"\nURL:{url}"
         )
     elif response.status_code == 451:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 451]: The request for the following URL "
             + "could not be completed because the contents of the URL "
@@ -714,30 +723,35 @@ def _get_webpage(url: str) -> requests.Response:
             + f"\nURL:{url}"
         )
     elif response.status_code == 500:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 500]: The request for the following URL "
             + "could not be completed due to an internal server error."
             + f"\nURL:{url}"
         )
     elif response.status_code == 502:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 502]: The request for the following URL "
             + "could not be completed due to a bad gateway."
             + f"\nURL:{url}"
         )
     elif response.status_code == 503:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 503]: The request for the following URL "
             + "could not be completed because the webpage is unavailable."
             + f"\nURL:{url}"
         )
     elif response.status_code == 504:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 504]: The request for the following URL "
             + "could not be completed due to a gateway timeout."
             + f"\nURL:{url}"
         )
     elif response.status_code == 511:
+        time.sleep(10)
         raise ConnectionRefusedError(
             "[HTTP 500]: The request for the following URL "
             + "could not be completed because you need to authenticate "
@@ -745,6 +759,7 @@ def _get_webpage(url: str) -> requests.Response:
             + f"\nURL:{url}"
         )
     else:
+        time.sleep(10)
         raise ConnectionAbortedError(
             "Could not access the following URL, and received "
             + f"an unhandled status code of `{response.status_code}`"
@@ -880,15 +895,36 @@ def _name_smother(name_str: str) -> str:
     # name_str = name_str.replace("3a")
     if name_str is None:
         return name_str
-    elif " (" in name_str:
+    elif isinstance(name_str, float):
+        return name_str
+    elif name_str == np.nan:
+        return name_str
+
+    name_str = name_str.strip()
+
+    if " (" in name_str:
         name_str = name_str.split(" (")[0]
     elif ", block error" in name_str:
         name_str = name_str.split(", block error")[0]
 
     if "," not in name_str:
         return name_str
+    elif name_str.count(",") == 2:
+        l_name, sfx, f_name = name_str.split(",")
+        name_str = f"{f_name} {l_name} {sfx}"
+        name_str = name_str.strip()
+        return name_str
     elif name_str.count(",") > name_str.count(" "):
+        try:
+            l_name, f_name = name_str.split(",")
+            name_str = f"{f_name} {l_name}"
+            return name_str
+        except ValueError:
+            return name_str
+    elif "," in name_str:
         l_name, f_name = name_str.split(",")
+        l_name = l_name.strip()
+        f_name = f_name.strip()
         name_str = f"{f_name} {l_name}"
         return name_str
     else:

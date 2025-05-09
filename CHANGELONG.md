@@ -1,6 +1,9 @@
 # `ncaa_stats_py` Changelog
 
-## 0.0.11: The "Football" update
+## 0.0.11: The "Football" update, Part I
+- Implemented `ncaa_stats_py.football.get_football_raw_pbp()`, to parse raw play-by-play data, and normalize the data into something that can be parsed at a later date.
+- Implemented `ncaa_stats_py.football.get_parsed_football_pbp()`, to parse play-by-play data into a format that can be queried at a later date.
+    - NOTE: Football PBP parser is still under development! Expect to see issues with parsing plays. If you find a game that does not work, [please raise an issue so that it can be fixed.](https://github.com/armstjc/ncaa_stats_py/issues)
 - For `ncaa_stats_py.baseball.get_baseball_game_player_stats()`, the following columns have been added:
     - `[stadium_name]`
     - `[attendance]`
