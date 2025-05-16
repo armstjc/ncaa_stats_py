@@ -237,6 +237,7 @@ def get_football_teams(season: int, level: str | int) -> pd.DataFrame:
             "NFS Team Code": "nfs_team_code",
             "Club Code": "team_abv_1",
             "Club Code 2": "team_abv_2",
+            "Club Code 3": "team_abv_3",
         },
         inplace=True
     )
@@ -245,6 +246,7 @@ def get_football_teams(season: int, level: str | int) -> pd.DataFrame:
         "nfs_team_code",
         "team_abv_1",
         "team_abv_2",
+        "team_abv_3",
     ]]
 
     if ncaa_level < 4:
@@ -430,6 +432,7 @@ def get_football_teams(season: int, level: str | int) -> pd.DataFrame:
             "nfs_team_code": "str",
             "team_abv_1": "str",
             "team_abv_2": "str",
+            "team_abv_3": "str",
         }
     )
 
@@ -1959,7 +1962,7 @@ def get_football_team_roster(team_id: int) -> pd.DataFrame:
     roster_df[["player_first_name", "player_last_name"]] = roster_df[
         "player_full_name"
     ].str.split(" ", n=1, expand=True)
-    roster_df = roster_df.infer_objects().replace(r'^\s*$', np.nan, regex=True)
+    # roster_df = roster_df.infer_objects()
 
     for i in roster_df.columns:
         if i in stat_columns:
@@ -2622,6 +2625,7 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
     """
     load_from_cache = True
     is_overtime = False
+    teams_df = pd.DataFrame()
 
     sport_id = "MFB"
     season = 0
@@ -2982,6 +2986,12 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
                 elif away_team_abv_2 in yrdln and len(away_team_abv) == 0:
                     away_team_abv = away_team_abv_2
                     team_side = away_team_id
+                elif home_team_abv_3 in yrdln and len(home_team_abv) == 0:
+                    home_team_abv = home_team_abv_3
+                    team_side = home_team_id
+                elif away_team_abv_3 in yrdln and len(away_team_abv) == 0:
+                    away_team_abv = away_team_abv_3
+                    team_side = away_team_id
                 elif temp_home_1 in yrdln:
                     home_team_abv = home_team_abv_1
                     team_side = home_team_id
@@ -3002,7 +3012,6 @@ def get_football_raw_pbp(game_id: int) -> pd.DataFrame:
                     team_side = home_team_id
                 elif len(away_team_abv_3) > 0 and away_team_abv_3 in yrdln:
                     team_side = away_team_id
-
                 else:
                     raise IndexError(
                         "Could not find out which side " +

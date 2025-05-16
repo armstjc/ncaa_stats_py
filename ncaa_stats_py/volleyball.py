@@ -2100,7 +2100,7 @@ def get_volleyball_team_roster(team_id: int) -> pd.DataFrame:
     roster_df[["player_first_name", "player_last_name"]] = roster_df[
         "player_full_name"
     ].str.split(" ", n=1, expand=True)
-    roster_df = roster_df.infer_objects().replace(r'^\s*$', np.nan, regex=True)
+    roster_df = roster_df.infer_objects()
 
     for i in roster_df.columns:
         if i in stat_columns:
