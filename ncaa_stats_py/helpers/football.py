@@ -1584,6 +1584,27 @@ def _football_pbp_helper(raw_df: pd.DataFrame) -> pd.DataFrame:
             temp_df["fumble_recovery_1_player_name"] = play_arr[0][6]
             temp_df["fumble_recovery_1_yards"] = int(play_arr[0][9])
         elif (
+            "middle pass complete" in event_text.lower() and
+            "touchdown" in event_text.lower()
+        ):
+            temp_df["is_qb_dropback"] = True
+            temp_df["is_pass_attempt"] = True
+            temp_df["is_complete_pass"] = True
+            temp_df["is_touchdown"] = True
+            temp_df["is_pass_touchdown"] = True
+
+            play_arr = re.findall(
+                r"([a-zA-Z\.\,\'\s\-]+) middle pass complete to ([a-zA-Z\.\,\'\s\-]+) for ([\-0-9]+) yard[s]? to the ([a-zA-Z0-9]+)\,? TOUCHDOWN",
+                event_text
+            )
+            temp_df["passer_player_name"] = play_arr[0][0]
+            # temp_df["pass_length"] = play_arr[0][1]
+            temp_df["pass_location"] = "middle"
+            temp_df["receiver_player_name"] = play_arr[0][1]
+            temp_df["passing_yards"] = int(play_arr[0][2])
+            temp_df["receiving_yards"] = int(play_arr[0][2])
+            temp_df["yards_gained"] = int(play_arr[0][2])
+        elif (
             "pass complete" in event_text.lower() and
             "touchdown" in event_text.lower() and
             (
@@ -2588,6 +2609,26 @@ def _football_pbp_helper(raw_df: pd.DataFrame) -> pd.DataFrame:
 
             tacklers_arr = play_arr[0][3]
         elif (
+            "rush quarterback draw for" in event_text.lower() and
+            (
+                "gain" not in event_text.lower() and
+                "loss" not in event_text.lower()
+            )
+        ):
+            temp_df["is_rush_attempt"] = True
+            temp_df["is_qb_dropback"] = True
+            play_arr = re.findall(
+                r"([a-zA-Z\.\,\'\s\-]+) rush quarterback draw for ([\-0-9]+) yard[s]? to the ([A-Z0-9]+) \(([a-zA-Z\.\,\;\'\s\-]+)\)",
+                event_text
+            )
+            temp_df["rusher_player_name"] = play_arr[0][0]
+            # temp_df["run_location"] = "middle"
+            # temp_df["run_gap"] = play_arr[0][2]
+            temp_df["rushing_yards"] = int(play_arr[0][1])
+            temp_df["yards_gained"] = int(play_arr[0][1])
+
+            tacklers_arr = play_arr[0][3]
+        elif (
             "rush" in event_text.lower() and
             (
                 "gain" not in event_text.lower() and
@@ -2624,6 +2665,28 @@ def _football_pbp_helper(raw_df: pd.DataFrame) -> pd.DataFrame:
                 temp_df["yards_gained"] = int(play_arr[0][1])
 
                 tacklers_arr = play_arr[0][3]
+        elif (
+            "rush for" in event_text.lower() and
+            (
+                "gain" not in event_text.lower() and
+                "loss" not in event_text.lower()
+            ) and "(" in event_text.lower() and
+            (
+                "out-of-bounds" in event_text.lower() or
+                "out of bounds" in event_text.lower()
+            )
+        ):
+            temp_df["is_rush_attempt"] = True
+            play_arr = re.findall(
+                r"([a-zA-Z\.\,\'\s\-]+) rush for ([\-0-9]+) yard[s]? to the ([A-Z0-9]+)\, [OUT|out]+\-? ?[OF|of]+\-? ?[BOUNDS|bounds]+ \(([a-zA-Z\.\,\;\'\s\-]+)\)",
+                event_text
+            )
+            temp_df["rusher_player_name"] = play_arr[0][0]
+            # temp_df["run_location"] = play_arr[0][1]
+            temp_df["rushing_yards"] = int(play_arr[0][1])
+            temp_df["yards_gained"] = int(play_arr[0][1])
+
+            tacklers_arr = play_arr[0][3]
         elif (
             "rush for" in event_text.lower() and
             (
@@ -2729,6 +2792,26 @@ def _football_pbp_helper(raw_df: pd.DataFrame) -> pd.DataFrame:
             temp_df["run_gap"] = play_arr[0][2]
             temp_df["rushing_yards"] = int(play_arr[0][3])
             temp_df["yards_gained"] = int(play_arr[0][3])
+
+            tacklers_arr = play_arr[0][5]
+        elif (
+            "rush over" in event_text.lower() and
+            "for loss of" in event_text.lower() and
+            (
+                "out-of-bounds" in event_text.lower() or
+                "out of bounds" in event_text.lower()
+            )
+        ):
+            temp_df["is_rush_attempt"] = True
+            play_arr = re.findall(
+                r"([a-zA-Z\.\,\'\s\-]+) rush over ([a-zA-Z]+) ([a-zA-Z]+) for loss of ([\-0-9]+) yard[s]? to the ([A-Z0-9]+)\, [OUT|out]+\-? ?[OF|of]+\-? ?[BOUNDS|bounds]+ \(([a-zA-Z\.\,\;\'\s\-]+)\)",
+                event_text
+            )
+            temp_df["rusher_player_name"] = play_arr[0][0]
+            temp_df["run_location"] = play_arr[0][1]
+            temp_df["run_gap"] = play_arr[0][2]
+            temp_df["rushing_yards"] = int(play_arr[0][3]) * -1
+            temp_df["yards_gained"] = int(play_arr[0][3]) * -1
 
             tacklers_arr = play_arr[0][5]
         elif (
@@ -2879,6 +2962,34 @@ def _football_pbp_helper(raw_df: pd.DataFrame) -> pd.DataFrame:
             temp_df["yards_gained"] = int(play_arr[0][2])
 
             tacklers_arr = play_arr[0][4]
+        elif (
+            "rush" in event_text.lower() and
+            "for loss of" in event_text.lower() and
+            (
+                "left" in event_text.lower() or
+                "middle" in event_text.lower() or
+                "right" in event_text.lower()
+            ) and
+            "fumble by" in event_text.lower() and
+            "recovered by" in event_text.lower()
+        ):
+            temp_df["is_rush_attempt"] = True
+            play_arr = re.findall(
+                r"([a-zA-Z\.\,\'\s\-]+) rush[ up| ]+?([a-zA-Z0-9]+) for loss of ([\-0-9]+) yard[s]? to the ([A-Z0-9]+)\, fumble by ([a-zA-Z\.\,\'\s\-]+) recovered by ([A-Z0-9]+) ([a-zA-Z\.\,\'\s\-]+) at ([A-Z0-9]+)\.",
+                event_text
+            )
+
+            temp_df["rusher_player_name"] = play_arr[0][0]
+            temp_df["run_location"] = play_arr[0][1]
+            temp_df["rushing_yards"] = int(play_arr[0][2]) * -1
+            temp_df["yards_gained"] = int(play_arr[0][2]) * -1
+
+            temp_df["fumbled_1_team"] = possession_team_arr[i]
+            temp_df["fumbled_1_player_name"] = play_arr[0][4]
+
+            temp_df["fumble_recovery_1_team"] = play_arr[0][5]
+            temp_df["fumble_recovery_1_player_name"] = play_arr[0][6]
+            temp_df["fumble_recovery_1_yards"] = 0
         elif (
             "rush" in event_text.lower() and
             "for loss of" in event_text.lower() and
