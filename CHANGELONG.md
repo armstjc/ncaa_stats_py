@@ -1,5 +1,11 @@
 # `ncaa_stats_py` Changelog
 
+## 0.0.12: The "Football" update, Part II
+- Fixed multiple team abbreviations in the `fb_team_abvs.csv` file to better parse play-by-play data.
+- Fixed multiple, previously unhandled game situations in `ncaa_stats_py.football.get_parsed_football_pbp()` that would cause the function to be unable to parse a game.
+- Fixed a bug where `ncaa_stats_py.football.get_football_raw_pbp()` would crash and burn spectacularly because it couldn't find a `[team_abv_3]` column.
+- Set the package version to `0.0.12`.
+
 ## 0.0.11: The "Football" update, Part I
 - Implemented `ncaa_stats_py.football.get_football_raw_pbp()`, to parse raw play-by-play data, and normalize the data into something that can be parsed at a later date.
 - Implemented `ncaa_stats_py.football.get_parsed_football_pbp()`, to parse play-by-play data into a format that can be queried at a later date.
