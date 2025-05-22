@@ -1057,7 +1057,13 @@ def get_baseball_day_schedule(
         if "(" in game_date_str:
             game_date_str = game_date_str.replace(")", "")
             game_date_str, game_num = game_date_str.split("(")
+
+            if "*If necessary" in game_num:
+                game_num = game_num.replace("*If necessary", "")
             game_num = int(game_num)
+
+        if "*If necessary" in game_date_str:
+            game_date_str = game_date_str.replace("*If necessary", "")
 
         if "TBA" in game_date_str:
             game_datetime = datetime.strptime(game_date_str, '%m/%d/%Y TBA')

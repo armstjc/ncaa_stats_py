@@ -1,5 +1,9 @@
 # `ncaa_stats_py` Changelog
 
+## 0.0.13: The "TBD" update
+- Fixed a bug in `ncaa_stats_py.baseball.get_baseball_day_schedule()` where the function would crash 
+- Set the package version to `0.0.13`.
+
 ## 0.0.12: The "Football" update, Part II
 - Fixed multiple team abbreviations in the `fb_team_abvs.csv` file to better parse play-by-play data.
 - Fixed multiple, previously unhandled game situations in `ncaa_stats_py.football.get_parsed_football_pbp()` that would cause the function to be unable to parse a game.
